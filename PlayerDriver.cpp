@@ -15,10 +15,11 @@ int main()
 
     std::cout << "Initializing Player" << player->getPID() << ": "  << player->getPlayerName()<< "\n";
     player->toAttack();
-    player->toDefend();
     player->issueOrder("bomb");
     player->issueOrder("deploy");
     player->printOrder();
+    Player* player2 = new Player(*player);
+    player2->toDefend();
     
     return 0;
 }
