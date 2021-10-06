@@ -63,7 +63,7 @@ int main() {
     orderList.moveOrder("bomb", 4);
 
     //Show move order function worked
-    cout << "Order list contains after move: " << orderList << endl;
+    cout << "Order list contains after move: \n" << orderList << endl;
 
     return 0;
 }
