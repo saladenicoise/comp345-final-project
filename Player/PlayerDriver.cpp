@@ -12,6 +12,7 @@ int main()
     vector<Order*> o;
 
     Player* player = new Player(name,1,t,c,o);
+    std::cout << *player <<std::endl;
     player->toAttack();
     player->issueOrder("bomb");
     player->issueOrder("deploy");
