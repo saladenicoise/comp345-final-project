@@ -18,7 +18,6 @@ int main()
     player->printOrder();
     Player* player2 = new Player(*player);
     player2->toDefend();
-    Player* player3;
     
     return 0;
 }
