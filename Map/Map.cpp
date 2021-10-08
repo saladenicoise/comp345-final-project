@@ -233,7 +233,7 @@ MapLoader::~MapLoader() { //MapLoader destructor
 Map* MapLoader::loadMap(string fileName){ //Load Map method, will return all maps even if not valid, if valid will be added to a list of created maps.
 
     Map* newMap = new Map();
-    newMap->mapName = fileName;
+    newMap->mapName = fileName.substr(0, fileName.find('.'));
 
     ifstream readMap(fileName);
     if(!readMap){
