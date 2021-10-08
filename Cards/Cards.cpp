@@ -41,21 +41,31 @@ void Card::play(Player& p, Deck& d, Hand& h)
     int index = h.findCard(*this);
 
     // Check if the player has said card
-    if (index = -1)
+    if (index == -1)
     {
         std::cout << "Cannot play this card, you do not have it in your hand!" << std::endl;
     } else {
-        cardType* t = getCardType();
+        cardType* ct = getCardType();
+        
         std::cout << "Playing Card: " << *this << std::endl;
     
         // Remove card from the hand
         h.remove(index);
-
         // Player orders
-        //--------------
-        
+        if (*ct == cardType::BOMB)
+            p.issueOrder("BOMB");
+        else if(*ct == cardType::AIRLIFT)
+            p.issueOrder("AIRLIFT");
+        else if(*ct == cardType::BLOCKADE)
+            p.issueOrder("BLOCKADE");
+        else if(*ct == cardType::DIPLOMACY)
+            p.issueOrder("DIPLOMACY");
+        else if(*ct == cardType::REINFORCEMENT)
+            p.issueOrder("REINFORCEMENT");
+        else
+            throw std::logic_error("Error: Invalid Card Type");
         // Add card back to the deck
-        d.add(*t);
+        d.add(*ct);
     }
 }
 
@@ -77,7 +87,7 @@ Card& Card::operator=(const Card& orig)
 // Overloading stream insertion
 std::ostream& operator<<(std::ostream& os, const Card& c)
 {
-    // Display card types
+    // Display card types to console
     if (*c.type == cardType::BOMB)
         return os << "Bomb";
     else if(*c.type == cardType::AIRLIFT)
@@ -161,7 +171,7 @@ void Deck::draw(Hand& h)
 {
     // Check if deck has cards
     if (deck.size() > 0)
-    {
+    {   
         // Draw the card at the back of the vector
         Card drawnCard = *this->deck.back();
         
@@ -169,11 +179,11 @@ void Deck::draw(Hand& h)
         cardType* t = drawnCard.getCardType();
 
         // Output message 
-        std::cout << "Drawing card of type: " << drawnCard << std::endl;
+        std::cout << "Drawing card: " << drawnCard << std::endl;
 
         // Remove card from the deck
         Deck::remove();
-
+    
         // Add the card to the hand of the player
         h.add(*t);
     } else {
@@ -185,9 +195,10 @@ void Deck::draw(Hand& h)
 void Deck::add(const cardType type)
 {
     deck.push_back(new Card(type));
+    shuffle();
 }
 
-// Remove function to remove a card from the back of the deck
+// Remove function to remove a card from the back of the deck and free memory
 void Deck::remove()
 {
     Card* p = deck.back();
@@ -199,7 +210,7 @@ void Deck::remove()
 // Randomly shuffles the deck of cards
 void Deck::shuffle()
 {
-    // Initialize the starting point
+    // Initialize the starting point seed
     srand(time(0));
     random_shuffle(deck.begin(), deck.end());
 }
@@ -272,7 +283,7 @@ Hand::~Hand()
 }
 
 // Add a card to the hand
-void Hand::add(const cardType type)
+void Hand::add(const cardType& type)
 {
     hand.push_back(new Card(type));
 }
@@ -341,6 +352,134 @@ std::ostream& operator<<(std::ostream& os, const Hand& h)
     for(Card* card : v)
     {
         std::cout << *card << " " << std::endl;
+    }
+    return os;
+}
+
+// Dummy classes implementation
+// Dummy player class
+Player::Player()
+{
+      this->h = new Hand();
+      this->olst = new OrderList();
+} //default constructor 
+
+Player::Player(string playerName,int pid, Hand* h, OrderList* o) //constructor for Player class
+{
+    this->playerName = playerName;
+    this->pid = pid;
+    this->h = new Hand();
+    this->olst = o;
+}
+
+Player::Player(const Player& p) //copy constructor
+{
+    this->playerName = p.playerName;
+    this->pid = p.pid;
+    this->h = p.h;
+    this->olst = p.olst;
+}
+
+Player::~Player() //destructor 
+{
+    playerName.clear();
+    // Delete the members that are pointers
+    delete this->h;
+    delete this->olst;
+    this->h = nullptr;
+    this->olst = nullptr;
+}
+
+void Player::issueOrder(const string& order) //creates an order object and adds it to the list of orders. 
+{
+    Order *newOrder = new Order(order);
+    this->olst->addOrder(newOrder);
+}
+
+
+// Overloaded assignment operator that create a deep copy of a card object.
+Player& Player::operator=(const Player& orig)
+{
+    if(this == &orig)
+    {
+        // Self-assignment guard
+        return *this;
+    }
+    // Perform copy
+    this->playerName = orig.playerName;
+    this->pid = orig.pid;
+    this->h = orig.h;
+    this->olst = orig.olst;
+
+    // Return the existing object so we can chain this operator
+    return *this;
+}
+
+// Overloading stream insertion
+std::ostream& operator<<(std::ostream& os, const Player& p)
+{
+    return os << "Initializing Player" << p.pid << ": "  << p.playerName<< "\n" <<std::endl;
+}
+
+// Dummy order class
+Order::Order() {} //default constructor for Order class 
+
+// param constructor to set the name variable of Order from subclasses
+Order::Order(const string& order)
+{
+    this->order = order;
+}
+
+// Overloaded assignment operator that create a deep copy of a card object.
+Order& Order::operator=(const Order& orig)
+{
+    if(this == &orig)
+    {
+        // Self-assignment guard
+        return *this;
+    }
+    // Perform copy
+    this->order = orig.order;
+
+    // Return the existing object so we can chain this operator
+    return *this;
+}
+
+// Overloading stream insertion
+std::ostream& operator<<(std::ostream& os, const Order& o)
+{
+    std::cout << o.order << " " << std::endl;
+    return os;
+}
+
+// OrderList Class, nothing speciall is needed here and we dont have a default value
+OrderList::OrderList() {}
+
+OrderList::OrderList(vector<Order *> orderList) {
+    this->orderList = orderList;
+}
+
+// Destructor
+OrderList::~OrderList() {
+    //Since we have a vector of pointers, we cannot simply delete the vectors, otherwise it would cause a memory leak. Thus we have to iterate through each and delete it whilst setting its pointer to null
+    for (Order *order : orderList) {
+        delete order;
+        order = nullptr;
+    }
+}
+
+// Add Order
+void OrderList::addOrder(Order *order) {
+    orderList.push_back(order);
+}
+
+// Overloading stream insertion
+std::ostream& operator<<(std::ostream& os, const OrderList& ol)
+{
+    std::vector<Order*> v = ol.orderList;
+    for(Order* c : v)
+    {
+        std::cout << *c << std::endl;
     }
     return os;
 }
