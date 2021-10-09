@@ -231,7 +231,8 @@ MapLoader::~MapLoader() { //MapLoader destructor
 }
 
 Map* MapLoader::loadMap(string fileName){ //Load Map method, will return all maps even if not valid, if valid will be added to a list of created maps.
-
+    bool countriesFound = false;
+    bool bordersFound = false;
     Map* newMap = new Map();
     newMap->mapName = fileName.substr(0, fileName.find('.'));
 
@@ -245,6 +246,7 @@ Map* MapLoader::loadMap(string fileName){ //Load Map method, will return all map
     while(getline(readMap, inputString)){
 
         if(inputString == "[countries]"){
+            countriesFound = true;
             while(getline(readMap, inputString) && inputString != "[borders]"){
 
                 if (inputString[0] == ';' || inputString.empty()) continue;
@@ -259,7 +261,7 @@ Map* MapLoader::loadMap(string fileName){ //Load Map method, will return all map
 
             }
             if(inputString == "[borders]"){
-
+                bordersFound = true;
                 while(getline(readMap, inputString)){
 
                     if (inputString[0] == ';' || inputString.empty()) continue;
@@ -282,6 +284,10 @@ Map* MapLoader::loadMap(string fileName){ //Load Map method, will return all map
                 }
             }
         }
+    }
+    if(!bordersFound || !countriesFound){
+        cout << "Could not generate map as there was missing info in this map file";
+        return nullptr;
     }
     //Stores the collection of continents in the map data structure.
     int numberOfContinents = 0;

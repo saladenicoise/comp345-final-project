@@ -10,7 +10,7 @@ int main() {
     test = test2.loadMap("bigeurope.map"); //Proper map example.
     test = test2.loadMap("fletzmap.map"); //Not all continents are fully connected sub-graphs
     test = test2.loadMap("austria.txt"); //Added a country to the file to make it not a fully connected graph.
-
+    test = test2.loadMap("test.txt"); //invalid map file, returns a null pointer prior to calling validate.
 
 
 
