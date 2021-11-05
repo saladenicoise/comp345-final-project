@@ -1,7 +1,8 @@
-#include <iostream>;
-#include <string>;
-#include <set>;
-#include "Map.h";
+#include <iostream>
+#include <string>
+#include <set>
+#include "Map.h"
+
 int main() {
     Map* test;
 

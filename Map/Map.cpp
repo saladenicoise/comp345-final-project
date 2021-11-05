@@ -11,22 +11,6 @@
 
 using namespace std;
 
-Player::Player(){ //Simply a dummy constructor for player.
-  playerName = "defaultName";
-};
-
-Player::Player(Player &player) { //Nothing to copy since player is currently a dummy class.
-  this->playerName = player.playerName;
-}
-
-Player& Player::operator=(const Player &player) { //dummy player assignment operator.
-    this->playerName = player.playerName;
-    return *this;
-}
-
-ostream& operator<<(std::ostream& os, const Player& player){ //dummy stream insertion overload.
-    return os << player.playerName;
-}
 
 Territory::Territory(string countryName, int continentNumber, int countryNumber){ //Territory constructor for default player/armycount
     this->countryName = countryName;

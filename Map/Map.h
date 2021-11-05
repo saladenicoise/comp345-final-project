@@ -7,14 +7,11 @@
 using namespace std;
 #include <vector>
 #include <ostream>
-class Player{
-public:
-    string playerName;
-    Player(Player& player);
-    Player& operator= (const Player& player);
-    friend ostream& operator<< (ostream& os, const Player& player);
-    Player();
-};
+#include "../Player/Player.h"
+class Player;
+class Territory;
+class Map;
+class MapLoader;
 
 class Territory{
 public:
@@ -23,7 +20,7 @@ public:
     Territory& operator= (const Territory& territory);
     Territory(string countryName, int continentNumber, int countryNumber);
     Territory(string countryName, int continentNumber, int countryNumber, int armyCount, Player* playerOccupying);
-    friend ostream& operator<< (ostream& os, const Player& Territory);
+    friend ostream& operator<< (ostream& os, const Territory& Territory);
     string countryName; //Name of the territory
     vector<Territory*> edges; //Connected territorys to the territory.
     int continentNumber; //Continent number of the territory
