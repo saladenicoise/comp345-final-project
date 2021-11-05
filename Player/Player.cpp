@@ -6,11 +6,18 @@
 using namespace std;
 Player::Player()
 {
-      this->h = new Hand();
-      this->olst = new OrderList();
+    this->h = new Hand();
+    this->olst = new OrderList();
 } //default constructor 
 
-Player::Player(string playerName,int pid, Territory * t, Hand* h, OrderList* o) //constructor for Player class
+Player::Player(string playerName)
+{
+    this->playerName = playerName;
+    this->h = new Hand();
+    this->olst = new OrderList();
+}
+
+Player::Player(string playerName,int pid, vector<Territory*> t, Hand* h, OrderList* o) // parameterized constructor for Player class
 {
     this->playerName = playerName;
     this->pid = pid;
@@ -23,7 +30,8 @@ Player::Player(const Player& p) //copy constructor
 {
     this->playerName = p.playerName;
     this->pid = p.pid;
-    this->t = p.t;
+    for (auto c : p.t)
+        this->t.push_back(new Territory(*c));
     this->h = p.h;
     this->olst = p.olst;
 }
@@ -31,7 +39,13 @@ Player::Player(const Player& p) //copy constructor
 Player::~Player() //destructor 
 {
     playerName.clear();
-    delete this->t;
+    if (!t.empty()) {
+    for (auto c : t) {
+        delete c;
+        c = nullptr;
+        }
+    }
+    t.clear();
     delete this->h;
     delete this->olst;
     this->h = nullptr;
@@ -55,7 +69,7 @@ Player &Player::operator=(const Player &p) //assignment operator overloader to c
 
 std::ostream &operator<<(std::ostream& os,const Player& p) //overloads stream insertion
 {
-    return os << "Initializing Player" << p.pid << ": "  << p.playerName<< "\n" <<std::endl;
+    return os << "Initializing Player" << ": "  << p.playerName<< "\n" << std::endl;
 }
 
 string Player::getPlayerName() //gets player's name 
@@ -63,7 +77,7 @@ string Player::getPlayerName() //gets player's name
     return playerName;
 }
 
-int Player::getPID()    //gets player's id
+int Player::getPID() //gets player's id
 {
     return pid;
 }
@@ -78,7 +92,7 @@ OrderList *Player::getOrderList() //returns order list object
 	return olst;
 }
 
-void Player::toAttack(vector<Territory*> toAttackTerritory, Player& p) 
+void Player::toAttack(vector<Territory*> toAttackTerritory, Player& p) // Territories to attack
 {
     std::string str ("Attack: ");
 
@@ -92,7 +106,7 @@ void Player::toAttack(vector<Territory*> toAttackTerritory, Player& p)
 	cout << endl;
 }
 
-void Player::toDefend(vector<Territory*> toDefendTerritory, Player& p) 
+void Player::toDefend(vector<Territory*> toDefendTerritory, Player& p) // Territories to defend
 {
     std::string str ("Defend: ");
     
@@ -105,7 +119,7 @@ void Player::toDefend(vector<Territory*> toDefendTerritory, Player& p)
 	cout << endl;
 }
 
-Territory* Player::getTerritories(){
+vector<Territory*> Player::getTerritories(){ // get players territories
 	return t;
 }
 
@@ -115,3 +129,10 @@ void Player::issueOrder(const string& order) //creates an order object and adds 
     this->olst->addOrder(newOrder);
 }
 
+int Player::getReinforcementPool() { // gets the number of armies in popl
+    return reinforcementPool;
+}
+
+void Player::setReinforcementPool(int pool) { // set pool size
+    this->reinforcementPool = pool;
+}

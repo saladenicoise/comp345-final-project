@@ -7,6 +7,7 @@
 #include <vector>
 #include <iostream>
 #include <ostream> 
+
 #include "../Cards/Cards.h"
 #include "../Orders/Orders.h"
 #include "../Map/Map.h"
@@ -22,7 +23,8 @@ class Player //this is the Player class
     
     public:
         Player(); //default constructor
-        Player(string playerName, int pid, Territory * t, Hand* h, OrderList* olst); //constructor  
+        Player(string playerName);
+        Player(string playerName, int pid, vector<Territory*> t, Hand* h, OrderList* olst); //constructor  
         Player(const Player& p); //copy constructor
         ~Player(); //deconstructor 
         string getPlayerName();
@@ -35,13 +37,19 @@ class Player //this is the Player class
         friend std::ostream& operator<<(std::ostream &os,const Player& p); //stream insertion operator
         Hand* getHand();
         OrderList* getOrderList();
-        Territory* getTerritories();
-    private:
+        vector<Territory*> getTerritories();
+        int getReinforcementPool();
+        void setReinforcementPool(int pool);
+
+    private: // data members
         string playerName;
         int pid;
-        Territory * t;
+        vector<Territory*> t;
         Hand* h; 
         OrderList* olst;
+        int reinforcementPool;
+
+        friend class GameEngine;
 };
 
 #endif //PLAYER_H
