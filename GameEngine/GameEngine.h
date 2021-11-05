@@ -4,6 +4,19 @@
 #include <iostream>
 #include <vector>
 #include <string>
+// For random shuffle
+#include <algorithm>
+#include <random>
+#include <chrono>
+
+#include "../Cards/Cards.h"
+#include "../Orders/Orders.h"
+#include "../Map/Map.h"
+#include "../Player/Player.h"
+
+class Map;
+class Deck;
+class Player;
 
 // Declaring class of GameEngine
 class GameEngine {
@@ -34,6 +47,10 @@ private:
     // declaration of a support function responsible for taking the order the player wishes to make
     void takeOrder();
 
+    Map *map;
+    vector<Player*> players;
+    Deck * deck;
+
 public:
 
     // default constructor declaration.
@@ -63,7 +80,7 @@ public:
     // declaration of destructor for class GameEngine
     ~GameEngine();
 
-
+    void startupPhase();
 };
 
 #endif

@@ -239,3 +239,84 @@ GameEngine::~GameEngine() {
     delete ordersToExecute;
     ordersToExecute = nullptr;
 }
+
+void GameEngine::startupPhase(){
+    MapLoader load_map = MapLoader();
+    deck = new Deck(30);
+    // loadmap command here
+    // TO DO: implement loop, the command prompt until correct file is in args
+    try {
+        this->map = load_map.loadMap("../Map/bigeurope.map");
+        // validatemap command here
+        if (map->validate())
+            cout << "Generated Map is a connected graph!\n" << endl;
+        else {
+            cout << "Error! Generated Map is not connected graph!\n" << endl;
+            throw 404;
+        }
+    } catch (int e) {
+        cout << "\n\n" << "Invalid map specified: " << e << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    // addplayer command here
+    // need min 2 players
+    for (int i = 1; i <= 2; i++) {
+        string playername = "Player " + std::to_string(i);
+
+        // Player creation
+        Player* player = new Player(playername);
+        players.push_back(player);
+    }
+
+    // gamestart command here
+    vector<Territory*> copiedTerritories(map->territories.size());
+    for(int i = 0; i < map->territories.size(); i++){
+        copiedTerritories[i] = map->territories[i];
+    }
+
+    // a) fairly distribute all the territories to the players
+    while(copiedTerritories.size() != 0){
+        for(auto it = players.begin(); it != players.end(); ++it){
+            if(copiedTerritories.size() != 0) {
+                int random = rand() % copiedTerritories.size();
+                Territory* randTerritory = copiedTerritories[random];
+                randTerritory->setPlayer(&*(*it));
+                (*it)->t.push_back(randTerritory);
+                copiedTerritories.erase(copiedTerritories.begin() + random);
+                copiedTerritories.shrink_to_fit();
+            }
+        }
+    }
+
+    // Display players' territories, reinforcement pool
+    for(auto it = players.begin(); it != players.end(); ++it){
+        cout << (*it)->getPlayerName() << ":" << endl;
+        cout << " " << endl;
+
+        // Showing the territories for each player and reinforcement pool
+        cout << "Territories assigned: " << endl;
+        for(int i = 0; i < (*it)->t.size(); i++){
+             cout<< "\t" << *(*it)->t[i] << endl;
+        }
+
+        // c) give 50 initial armies to the players, which are placed in their respective reinforcement pool
+        (*it)->setReinforcementPool(50);
+        cout << "Armies in reinforcement pool: " << (*it)->getReinforcementPool() << endl;
+
+        // d) let each player draw 2 initial cards from the deck using the deck’s draw() method
+        for (int i = 0; i < 2; i++) {
+            deck->draw((*it)->getHand());
+        }
+        cout << "------------------\n" << endl;
+        
+    }
+    // b) determine randomly the order of play of the players in the game
+    unsigned seed = std::chrono::system_clock::now()
+                        .time_since_epoch()
+                        .count();
+    std::shuffle(std::begin(players), std::end(players), std::default_random_engine());
+
+    // e) switch the game to the play phase
+
+}
