@@ -27,6 +27,8 @@ public:
     int countryNumber; //Country number of the territory
     int armyCount; //army count of the territory
     Player* playerOccupying; //Player occupying the territory.
+    void setPlayer(Player* playerOccupying);
+    string getPlayerName();
 };
 class Map{
 public:

@@ -300,5 +300,16 @@ Map* MapLoader::loadMap(string fileName){ //Load Map method, will return all map
     return newMap;
 }
 
+//set players name that owns the territory
+void Territory::setPlayer(Player *player) { 
+    this->playerOccupying = player;
+}
 
-
+//get players name that owns the territory
+string Territory::getPlayerName() { 
+    if (this->playerOccupying == nullptr)
+        return nullptr;
+    else {
+        return this->playerOccupying->getPlayerName();
+    }
+}
