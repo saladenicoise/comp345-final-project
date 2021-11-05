@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 // Declaring class of GameEngine
 class GameEngine {
