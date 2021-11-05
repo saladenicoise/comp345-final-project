@@ -1,16 +1,22 @@
 #include "Player.h"
 #include <iostream>
 #include <ostream> 
-using namespace std;
-Player::Player() {} //default constructor 
+#include <string>
 
-Player::Player(string playerName,int pid, Territory* t, Cards* c, vector<Order*> o) //constructor for Player class
+using namespace std;
+Player::Player()
+{
+      this->h = new Hand();
+      this->olst = new OrderList();
+} //default constructor 
+
+Player::Player(string playerName,int pid, Territory * t, Hand* h, OrderList* o) //constructor for Player class
 {
     this->playerName = playerName;
     this->pid = pid;
     this->t = t;
-    this->c = c;
-    this->orderList = o;
+    this->h = h;
+    this->olst = o;
 }
 
 Player::Player(const Player& p) //copy constructor
@@ -18,29 +24,32 @@ Player::Player(const Player& p) //copy constructor
     this->playerName = p.playerName;
     this->pid = p.pid;
     this->t = p.t;
-    this->c = p.c;
-    this->orderList = p.orderList;
+    this->h = p.h;
+    this->olst = p.olst;
 }
 
 Player::~Player() //destructor 
 {
     playerName.clear();
-    delete t;
-    delete c;
-    for (auto order: orderList)
-    {
-        delete order; 
-    }
-	orderList.clear();
+    delete this->t;
+    delete this->h;
+    delete this->olst;
+    this->h = nullptr;
+    this->olst = nullptr;
 }
 
 Player &Player::operator=(const Player &p) //assignment operator overloader to create deep copy 
 {
+    if(this == &p)
+    {
+        // Self-assignment guard
+        return *this;
+    }
     this->playerName = p.playerName;
     this->pid = p.pid;
     this->t = p.t;
-    this->c = p.c;
-    this->orderList = p.orderList;
+    this->h = p.h;
+    this->olst = p.olst;
     return *this;
 }
 
@@ -59,77 +68,50 @@ int Player::getPID()    //gets player's id
     return pid;
 }
 
-void Player::toAttack() //returns a list of territories that are to be attacked from the territory class
+Hand *Player::getHand() //returns hand object
 {
-    std::cout << "Territories to attack:" <<std::endl;
-    t -> getTerritory();
+    return h;
 }
 
-void Player::toDefend() //returns a list of territories that are to be defended from the territory class
+OrderList *Player::getOrderList() //returns order list object
 {
-    std::cout << "Territories to defend:" << std::endl;
-    t -> getTerritory();
+	return olst;
 }
 
-void Player::issueOrder(string order) //creates an order object and adds it to the list of orders. 
+void Player::toAttack(vector<Territory*> toAttackTerritory, Player& p) 
 {
-	Order *newOrder = new Order(order);
-	orderList.push_back(newOrder);
-}
+    std::string str ("Attack: ");
 
-vector<Order*> Player::getOrderList() //returns order list object
-{
-	return orderList;
-}
-
-void Player::printOrder() //prints order
-{
-   std::cout << "Orderlist:" << std::endl;
-   vector<Order*>::iterator it = orderList.begin();
-	for (; it != orderList.end(); it++)
+	cout << "The list of territories that are be attacked" << endl;
+	for (int i = 0; i < toAttackTerritory.size(); i++)
 	{
-		cout << (*it)->returnOrder() << std::endl;
+		cout << *toAttackTerritory[i] << endl;
+        p.issueOrder(str.append(toAttackTerritory[i]->countryName));
 	}
+
+	cout << endl;
 }
 
-Territory::Territory() {}//constructor for Territory class 
-
-void Territory::setTerritory(string name) //mutator method for territories
+void Player::toDefend(vector<Territory*> toDefendTerritory, Player& p) 
 {
-    t.push_back(&name);
+    std::string str ("Defend: ");
+    
+	cout << "The list of territories that are be defended" << endl;
+	for (int i = 0; i < toDefendTerritory.size(); i++)
+	{
+		cout << *toDefendTerritory[i] << endl;
+        p.issueOrder(str.append(toDefendTerritory[i]->countryName));
+	}
+	cout << endl;
 }
 
-void Territory::getTerritory() //returns a collection of territories
+Territory* Player::getTerritories(){
+	return t;
+}
+
+void Player::issueOrder(const string& order) //creates an order object and adds it to the list of orders. 
 {
-    for (int i = 0; i < t.size(); i++)
-    {
-        std::cout << *t[i] << std::endl;
-    }
+    Order *newOrder = new Order(order);
+    this->olst->addOrder(newOrder);
 }
 
-Cards::Cards() {} //constructor for Cards class 
-
-void Cards::setCard(string name) //mutator method for Cards 
-{
-    c.push_back(&name);
-}
-
-void Cards::hands() //returns a player's hands
-{
-    for (int i = 0; i < c.size(); i++)
-    {
-        std::cout << *c[i] << std::endl;
-    }
-}
-
-Order::Order() {} //default constructor for Order class 
-
-Order::Order(string o) //constructor for Order class 
-{
-    this->order = o;
-}
-
-string Order::returnOrder() //returns a player's orders
-{
-    return order;
-}

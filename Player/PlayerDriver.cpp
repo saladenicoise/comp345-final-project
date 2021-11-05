@@ -3,22 +3,35 @@
 int main()
 {
     string name = "John";
-    Territory* t = new Territory();
-    t->setTerritory("Europe");
-    t->setTerritory("Russia");
-    Cards* c = new Cards();
-    c->setCard("bomb");
-    c->setCard("airlift");
-    vector<Order*> o;
+    Territory* t = new Territory("Germany", 1, 6);
+    Territory* t2 = new Territory("Russia", 3, 6);
+	vector<Territory*> toDefendTerritory;
+	vector<Territory*> toAttackTerritory;
 
-    Player* player = new Player(name,1,t,c,o);
+    Deck* deck = new Deck();
+    Player* player = new Player();
+
     std::cout << *player <<std::endl;
-    player->toAttack();
-    player->issueOrder("bomb");
-    player->issueOrder("deploy");
-    player->printOrder();
-    Player* player2 = new Player(*player);
-    player2->toDefend();
+
+    for (int i = 0; i < 5; i++) {
+        deck->draw(player->getHand());
+    }
+    // Issue Orders from hand
+    player->getHand()->cardAtIndex(0).play(*player, *deck, *player->getHand());
+    player->getHand()->cardAtIndex(1).play(*player, *deck, *player->getHand());
+
+	toDefendTerritory.push_back(t);
+	toAttackTerritory.push_back(t2);
+
+    player->toDefend(toDefendTerritory, *player);
+    player->toAttack(toAttackTerritory, *player);
+
+
+    std::cout << "Player 0's order list: \n" << *player->getOrderList() <<std::endl;
+    
+    Player* player1 = new Player();
+    player1->toAttack(toAttackTerritory, *player1);
+    std::cout << "Player 1's order list: \n" << *player1->getOrderList() <<std::endl;
     
     return 0;
 }
