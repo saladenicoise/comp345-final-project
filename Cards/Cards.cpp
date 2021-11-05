@@ -4,7 +4,9 @@
 // This file uses names declared in the Cards.h header file 
 #include "Cards.h"
 // For random_shuffle
-#include <bits/stdc++.h>
+#include <random>
+#include <algorithm>
+
 
 // Card class implementation
 // Default Constructor, make an empty card
@@ -167,7 +169,7 @@ Deck::~Deck()
 }
 
 // Draw function to get a card from the deck to the hand of the player
-void Deck::draw(Hand& h)
+void Deck::draw(Hand* h)
 {
     // Check if deck has cards
     if (deck.size() > 0)
@@ -185,7 +187,7 @@ void Deck::draw(Hand& h)
         Deck::remove();
     
         // Add the card to the hand of the player
-        h.add(*t);
+        h->add(*t);
     } else {
         std::cout << "Cannot draw, deck is empty!" << std::endl;
     }
@@ -211,8 +213,10 @@ void Deck::remove()
 void Deck::shuffle()
 {
     // Initialize the starting point seed
-    srand(time(0));
-    random_shuffle(deck.begin(), deck.end());
+    std::random_device rd;
+    std::mt19937 g(rd());
+
+    std::shuffle(deck.begin(), deck.end(), g);
 }
 
 // Get the number of cards remaining in the deck
@@ -352,134 +356,6 @@ std::ostream& operator<<(std::ostream& os, const Hand& h)
     for(Card* card : v)
     {
         std::cout << *card << " " << std::endl;
-    }
-    return os;
-}
-
-// Dummy classes implementation
-// Dummy player class
-Player::Player()
-{
-      this->h = new Hand();
-      this->olst = new OrderList();
-} //default constructor 
-
-Player::Player(string playerName,int pid, Hand* h, OrderList* o) //constructor for Player class
-{
-    this->playerName = playerName;
-    this->pid = pid;
-    this->h = new Hand();
-    this->olst = o;
-}
-
-Player::Player(const Player& p) //copy constructor
-{
-    this->playerName = p.playerName;
-    this->pid = p.pid;
-    this->h = p.h;
-    this->olst = p.olst;
-}
-
-Player::~Player() //destructor 
-{
-    playerName.clear();
-    // Delete the members that are pointers
-    delete this->h;
-    delete this->olst;
-    this->h = nullptr;
-    this->olst = nullptr;
-}
-
-void Player::issueOrder(const string& order) //creates an order object and adds it to the list of orders. 
-{
-    Order *newOrder = new Order(order);
-    this->olst->addOrder(newOrder);
-}
-
-
-// Overloaded assignment operator that create a deep copy of a card object.
-Player& Player::operator=(const Player& orig)
-{
-    if(this == &orig)
-    {
-        // Self-assignment guard
-        return *this;
-    }
-    // Perform copy
-    this->playerName = orig.playerName;
-    this->pid = orig.pid;
-    this->h = orig.h;
-    this->olst = orig.olst;
-
-    // Return the existing object so we can chain this operator
-    return *this;
-}
-
-// Overloading stream insertion
-std::ostream& operator<<(std::ostream& os, const Player& p)
-{
-    return os << "Initializing Player" << p.pid << ": "  << p.playerName<< "\n" <<std::endl;
-}
-
-// Dummy order class
-Order::Order() {} //default constructor for Order class 
-
-// param constructor to set the name variable of Order from subclasses
-Order::Order(const string& order)
-{
-    this->order = order;
-}
-
-// Overloaded assignment operator that create a deep copy of a card object.
-Order& Order::operator=(const Order& orig)
-{
-    if(this == &orig)
-    {
-        // Self-assignment guard
-        return *this;
-    }
-    // Perform copy
-    this->order = orig.order;
-
-    // Return the existing object so we can chain this operator
-    return *this;
-}
-
-// Overloading stream insertion
-std::ostream& operator<<(std::ostream& os, const Order& o)
-{
-    std::cout << o.order << " " << std::endl;
-    return os;
-}
-
-// OrderList Class, nothing speciall is needed here and we dont have a default value
-OrderList::OrderList() {}
-
-OrderList::OrderList(vector<Order *> orderList) {
-    this->orderList = orderList;
-}
-
-// Destructor
-OrderList::~OrderList() {
-    //Since we have a vector of pointers, we cannot simply delete the vectors, otherwise it would cause a memory leak. Thus we have to iterate through each and delete it whilst setting its pointer to null
-    for (Order *order : orderList) {
-        delete order;
-        order = nullptr;
-    }
-}
-
-// Add Order
-void OrderList::addOrder(Order *order) {
-    orderList.push_back(order);
-}
-
-// Overloading stream insertion
-std::ostream& operator<<(std::ostream& os, const OrderList& ol)
-{
-    std::vector<Order*> v = ol.orderList;
-    for(Order* c : v)
-    {
-        std::cout << *c << std::endl;
     }
     return os;
 }
