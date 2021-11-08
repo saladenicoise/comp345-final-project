@@ -16,18 +16,17 @@ Territory::Territory(string countryName, int continentNumber, int countryNumber)
     this->countryName = countryName;
     this->continentNumber = continentNumber;
     this->countryNumber = countryNumber;
-    playerOccupying = new Player();
+    this->ownerId = 0;
     armyCount = 0;
     edges = vector<Territory*>(0);
 }
-Territory::Territory(string countryName, int continentNumber, int countryNumber, int armyCount, Player* playerOccupying){ //Territory constructor with player/army count
+Territory::Territory(string countryName, int continentNumber, int countryNumber, int armyCount, int playerId){ //Territory constructor with player/army count
     this->countryName = countryName;
     this->continentNumber = continentNumber;
     this->countryNumber = countryNumber;
     this->armyCount = armyCount;
     edges = vector<Territory*>(0);
-    this->playerOccupying = playerOccupying;
-
+    this->ownerId = playerId;
 }
 
 Territory::Territory(Territory &territory) { //Territory copy constructor.
@@ -35,14 +34,16 @@ Territory::Territory(Territory &territory) { //Territory copy constructor.
     this->continentNumber = territory.continentNumber;
     this->countryName = territory.countryName;
     this->armyCount = territory.armyCount;
-    this->playerOccupying = new Player(*territory.playerOccupying);
+    this->ownerId = territory.ownerId;
     this->edges = vector<Territory *>(territory.edges.size());
 
         for(Territory* t : territory.edges){
             this->edges.push_back(new Territory(*t));
         }
-
 }
+
+
+
 ostream& operator<<(std::ostream& os, const Territory& territory){ //Territory ostream insert overload
     return os << territory.countryName;
 }
@@ -52,7 +53,7 @@ Territory& Territory::operator=(const Territory &territory) {//Territory = opera
     this->continentNumber = territory.continentNumber;
     this->countryName = territory.countryName;
     this->armyCount = territory.armyCount;
-    this->playerOccupying = new Player(*territory.playerOccupying);
+    this->ownerId = territory.ownerId;
     this->edges = vector<Territory *>(territory.edges.size());
 
     for(Territory* t : territory.edges){
@@ -189,7 +190,7 @@ MapLoader::MapLoader(){ //MapLoader constructor
     loadedMaps = vector<Map*>(0);
 }
 
-MapLoader::MapLoader(MapLoader &mapLoader){ //MapLoader copy constructor
+MapLoader::MapLoader(const MapLoader &mapLoader){ //MapLoader copy constructor
     this->loadedMaps = vector<Map*>(mapLoader.loadedMaps.size());
     for(Map* m : mapLoader.loadedMaps){
         this->loadedMaps.push_back(new Map(*m));
@@ -300,16 +301,7 @@ Map* MapLoader::loadMap(string fileName){ //Load Map method, will return all map
     return newMap;
 }
 
-//set players name that owns the territory
-void Territory::setPlayer(Player *player) { 
-    this->playerOccupying = player;
-}
-
-//get players name that owns the territory
-string Territory::getPlayerName() { 
-    if (this->playerOccupying == nullptr)
-        return nullptr;
-    else {
-        return this->playerOccupying->getPlayerName();
-    }
+//sets the id to the player id
+void Territory::setOwnerId(int playerId) { 
+    this->ownerId = playerId;
 }

@@ -2,7 +2,10 @@
 #define Orders
 #include <string>
 #include <vector>
+#include "Map/Map.h"
 using namespace std;
+
+class Player;
 
 class Order {
     private:
@@ -68,16 +71,27 @@ class Deploy : public Order {
 
     private:
         string orderType;
+        Player* sourcePlayer;
+        Territory* targetTerritory;
+        int numtoDeploy;
+
 
     public:
         //Constructors
         Deploy();
+        Deploy(Player *playerIn, Territory *territoryIn, int toDeployNum);
         Deploy(const Deploy &deploy);
         //Destructor
         ~Deploy();
 
         //Getter
         string getOrderType();
+
+        Player* getPlayer();
+
+        Territory* getTerritory();
+
+        int getToDeploy();
 
         //Is our order valid
         bool validate();
@@ -96,16 +110,32 @@ class Advance : public Order {
 
     private:
         string orderType;
+        Player* sourcePlayer;
+        Player* targetPlayer;
+        Territory* attackSource;
+        Territory* attackTarget;
+        int numOfUnits;
 
     public:
         //Constructors
         Advance();
+        Advance(Player *attackerIn, Player *defenderIn, Territory *attackSourceIn, Territory *attackTarget, int numOfUnits);
         Advance(const Advance &advance);
         //Destructor
         ~Advance();
 
         //Getter
         string getOrderType();
+
+        Player* getAttacker();
+
+        Player* getDefender();
+
+        Territory* getAttackSource();
+
+        Territory* getAttackTarget();
+
+        int getNumOfUnits();
 
         //Is our order valid
         bool validate();
@@ -124,16 +154,23 @@ class Bomb : public Order {
 
     private:
         string orderType;
+        Player* sourcePlayer;
+        Territory* target;
 
     public:
         //Constructors
         Bomb();
+        Bomb(Player *playerIn, Territory* target);
         Bomb(const Bomb &bomb);
         //Destructor
         ~Bomb();
 
         //Getter
         string getOrderType();
+
+        Player* getPlayer();
+
+        Territory* getTarget();
 
         //Is our order valid
         bool validate();
@@ -152,16 +189,23 @@ class Blockade : public Order {
 
     private:
         string orderType;
+        Player* sourcePlayer;
+        Territory* target;
 
     public:
         //Constructors
         Blockade();
+        Blockade(Player *playerIn, Territory *targetIn);
         Blockade(const Blockade &blockade);
         //Destructor
         ~Blockade();
 
         //Getter
         string getOrderType();
+
+        Player* getPlayer();
+
+        Territory* getTarget();
 
         //Is our order valid
         bool validate();
@@ -180,16 +224,29 @@ class Airlift : public Order {
 
     private:
         string orderType;
+        Player* sourcePlayer;
+        Territory* source;
+        Territory* dest;
+        int numOfArmies;
 
     public:
         //Constructors
         Airlift();
+        Airlift(Player *playerIn, Territory *sourceIn, Territory* destIn, int numOfArmies);
         Airlift(const Airlift &airlift);
         //Destructor
         ~Airlift();
 
         //Getter
         string getOrderType();
+
+        Player* getPlayer();
+
+        Territory* getSource();
+
+        Territory* getDest();
+
+        int getNumOfArmies();
 
         //Is our order valid
         bool validate();
@@ -208,16 +265,23 @@ class Negotiate : public Order {
 
     private:
         string orderType;
+        Player* sourcePlayer;
+        Player* targetPlayer;
 
     public:
         //Constructors
         Negotiate();
+        Negotiate(Player* sourcePlayer, Player* targetPlayer);
         Negotiate(const Negotiate &negotiate);
         //Destructor
         ~Negotiate();
 
         //Getter
         string getOrderType();
+
+        Player* getSourcePlayer();
+
+        Player* getTargetPlayer();
 
         //Is our order valid
         bool validate();

@@ -6,24 +6,25 @@
 using namespace std;
 Player::Player()
 {
-    this->h = new Hand();
+    //this->h = new Hand();
     this->olst = new OrderList();
 } //default constructor 
 
 Player::Player(string playerName)
 {
     this->playerName = playerName;
-    this->h = new Hand();
+    //this->h = new Hand();
     this->olst = new OrderList();
 }
 
-Player::Player(string playerName,int pid, vector<Territory*> t, Hand* h, OrderList* o) // parameterized constructor for Player class
+Player::Player(string playerName,int pid, vector<Territory*> t, Hand* h, OrderList* o, vector<Player*> noAttack) // parameterized constructor for Player class
 {
     this->playerName = playerName;
     this->pid = pid;
     this->t = t;
     this->h = h;
     this->olst = o;
+    this->cannotAttack = noAttack;
 }
 
 Player::Player(const Player& p) //copy constructor
@@ -34,6 +35,8 @@ Player::Player(const Player& p) //copy constructor
         this->t.push_back(new Territory(*c));
     this->h = p.h;
     this->olst = p.olst;
+    for (auto a : p.cannotAttack)
+        this->cannotAttack.push_back(new Player(*a));
 }
 
 Player::~Player() //destructor 
@@ -50,6 +53,13 @@ Player::~Player() //destructor
     delete this->olst;
     this->h = nullptr;
     this->olst = nullptr;
+    if(!cannotAttack.empty()) {
+        for(auto a : cannotAttack) {
+            delete a;
+            a = nullptr;
+        }
+    }
+    cannotAttack.clear();
 }
 
 Player &Player::operator=(const Player &p) //assignment operator overloader to create deep copy 
@@ -64,6 +74,7 @@ Player &Player::operator=(const Player &p) //assignment operator overloader to c
     this->t = p.t;
     this->h = p.h;
     this->olst = p.olst;
+    this->cannotAttack = p.cannotAttack;
     return *this;
 }
 
@@ -90,6 +101,14 @@ Hand *Player::getHand() //returns hand object
 OrderList *Player::getOrderList() //returns order list object
 {
 	return olst;
+}
+
+vector<Player*> Player::getNotAttackablePlayers() { // get not attackable players
+    return cannotAttack;
+}
+
+void Player::setNotAttackablePlayers(vector<Player*> cannotAttack) { //set not attackable players
+    this->cannotAttack = cannotAttack;
 }
 
 void Player::toAttack(vector<Territory*> toAttackTerritory, Player& p) // Territories to attack
@@ -121,6 +140,10 @@ void Player::toDefend(vector<Territory*> toDefendTerritory, Player& p) // Territ
 
 vector<Territory*> Player::getTerritories(){ // get players territories
 	return t;
+}
+
+void Player::setTerritories(vector<Territory*> newTerritoryList) {
+    t = newTerritoryList; //Update the territory list
 }
 
 void Player::issueOrder(const string& order) //creates an order object and adds it to the list of orders. 

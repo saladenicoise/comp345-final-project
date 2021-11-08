@@ -8,9 +8,9 @@
 #include <iostream>
 #include <ostream> 
 
-#include "../Cards/Cards.h"
-#include "../Orders/Orders.h"
-#include "../Map/Map.h"
+#include "Orders/Orders.h"
+#include "Map/Map.h"
+#include "Cards/Cards.h"
 
 class Player;
 class Territory;
@@ -24,7 +24,7 @@ class Player //this is the Player class
     public:
         Player(); //default constructor
         Player(string playerName);
-        Player(string playerName, int pid, vector<Territory*> t, Hand* h, OrderList* olst); //constructor  
+        Player(string playerName, int pid, vector<Territory*> t, Hand* h, OrderList* olst, vector<Player*> noAttack); //constructor  
         Player(const Player& p); //copy constructor
         ~Player(); //deconstructor 
         string getPlayerName();
@@ -38,6 +38,9 @@ class Player //this is the Player class
         Hand* getHand();
         OrderList* getOrderList();
         vector<Territory*> getTerritories();
+        vector<Player*> getNotAttackablePlayers();
+        void setNotAttackablePlayers(vector<Player*> newUnattackablePlayer);
+        void setTerritories(vector<Territory*> newTerritories);
         int getReinforcementPool();
         void setReinforcementPool(int pool);
 
@@ -48,6 +51,7 @@ class Player //this is the Player class
         Hand* h; 
         OrderList* olst;
         int reinforcementPool;
+        vector<Player*> cannotAttack;
 
         friend class GameEngine;
 };
