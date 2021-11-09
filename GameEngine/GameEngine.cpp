@@ -6,6 +6,7 @@ GameEngine::GameEngine() {
     nextValidCommands = new std::vector<std::string>;
     nextValidCommands->push_back("start");
     ordersToExecute = new std::vector<std::string>;
+    commandProcessor = new CommandProcessor();
 }
 
 // Defining the copy constructor for the GameEngine class
@@ -20,6 +21,8 @@ GameEngine::GameEngine(const GameEngine &gameEngine) {
     for(int i = 0; i < gameEngine.ordersToExecute->size(); i++) {
         ordersToExecute->push_back(gameEngine.ordersToExecute->at(i));
     }
+
+    commandProcessor = new CommandProcessor(*gameEngine.commandProcessor);
 
 }
 
@@ -40,6 +43,7 @@ GameEngine& GameEngine::operator=(const GameEngine &gameEngine) {
         ordersToExecute->push_back(gameEngine.ordersToExecute->at(i));
     }
 
+    commandProcessor = new CommandProcessor(*gameEngine.commandProcessor);
 
     return *this;
 }

@@ -13,6 +13,7 @@
 #include "../Orders/Orders.h"
 #include "../Map/Map.h"
 #include "../Player/Player.h"
+#include "../Command/CommandProcessing.h"
 
 class Map;
 class Deck;
@@ -32,6 +33,9 @@ private:
 
     // declaring a pointer to an orders vector.
     std::vector<std::string> * ordersToExecute;
+
+    // declaring a pointer to a command processor object
+    CommandProcessor *commandProcessor;
 
     // declaring a support function for checking if the command entered is correct
     bool checkIfValid(std::string command);
@@ -72,6 +76,9 @@ public:
 
     // getter function for attribute state declaration
     std::string getState() const;
+
+    // getter function for commandProcessor
+    CommandProcessor getCommandProcessor();
 
     // setter function for attribute state declaration
     void setState(std::string state);
