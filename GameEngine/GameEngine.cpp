@@ -57,6 +57,11 @@ void GameEngine::setState(std::string state) {
     *this->state = state;
 }
 
+// Defining the support function for checking if the command entered by the player leads to a valid transition
+bool GameEngine::validTransition(std::string command) {
+    return commandProcessor->validate(command, *nextValidCommands);
+}
+
 // Defining the support function that handles the transition from state to state
 void GameEngine::doTransition(std::string command) {
     std::string oldState;
@@ -258,7 +263,7 @@ void GameEngine::transition(std::string command) {
 
     if(valid) {
 
-        if(commandProcessor->validate(command, *nextValidCommands)) {
+        if(validTransition(command)) {
             doTransition(command);
         } else {
             commandProcessor->commands.at(lastCommandIndex)->saveEffect("Not a valid transition. Cannot " + command + " at state " + state);

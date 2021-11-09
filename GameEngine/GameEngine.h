@@ -37,6 +37,9 @@ private:
     // declaring a pointer to a command processor object
     CommandProcessor *commandProcessor;
 
+    // declaring a support function that uses the command processor object's validate method.
+    bool validTransition(std::string command);
+
     // declaring a support function for handling the steps associated with the transition
     void doTransition(std::string command);
 
