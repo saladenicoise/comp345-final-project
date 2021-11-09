@@ -46,6 +46,10 @@ CommandProcessor::CommandProcessor(CommandProcessor &comProcObj) {
 }
 
 CommandProcessor::~CommandProcessor() {
+    for(int i = 0; i < commands.size(); i++) {
+        delete commands.at(i);
+        commands.at(i) = nullptr;
+    }
     cout << "Destroyed CommandProcessor Object Instance" << endl;
 }
 
