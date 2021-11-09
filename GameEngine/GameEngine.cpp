@@ -240,7 +240,7 @@ void GameEngine::startupPhase(std::string command) {
 // Defining the support function responsible for displaying the current transition taking place
 std::string GameEngine::displayTransition(std::string state, std::string *newState, std::string command) {
     string transitionString = "Current state: " + state + ". Command: " + command
-                                + ". Transition to state: " + newState;
+                                + ". Transition to state: " + *newState;
     std::cout << transitionString << std::endl << std::endl;
 
     return transitionString;
@@ -275,7 +275,7 @@ void GameEngine::transition() {
         if(validTransition(command)) {
             doTransition(command);
         } else {
-            commandProcessor->commands.at(lastCommandIndex)->saveEffect("Not a valid transition. Cannot " + command + " at state " + state);
+            commandProcessor->commands.at(lastCommandIndex)->saveEffect("Not a valid transition. Cannot " + command + " at state " + *state);
             std::cout << commandProcessor->commands.at(lastCommandIndex)->getEffect() << std::endl;
         }
 
