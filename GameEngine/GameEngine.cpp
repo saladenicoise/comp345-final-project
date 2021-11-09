@@ -63,59 +63,27 @@ void GameEngine::doTransition(std::string command) {
 
     startupPhase(command);
     
-    if (command == "assignreinforcement") {
-        oldState = *state;
-        setState("assignreinforcement");
-        displayTransition(oldState, state, command);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("issueorder");
-    } else if (command == "issueorder") {
-        takeOrder();
-        oldState = *state;
-        setState("Issue Orders");
-        displayTransition(oldState, state, command);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("issueorder");
-        nextValidCommands->push_back("endissueorders");
-    } else if (command == "endissueorders") {
-        oldState = *state;
-        setState("Execute Orders");
-        displayTransition(oldState, state, command);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("execorder");
-        nextValidCommands->push_back("endexecorders");
-    } else if (command == "execorder") {
-        if(ordersToExecute->size() == 0) {
-            std::cout << "No more orders to execute." << std::endl;
-            return;
-        }
-        std::cout << "Executing order \"" << ordersToExecute->back() << "\"" << std::endl;
-        ordersToExecute->pop_back();
-        nextValidCommands->clear();
-        nextValidCommands->push_back("execorder");
-        nextValidCommands->push_back("endexecorders");
-        nextValidCommands->push_back("win");
-    } else if (command == "endexecorders") {
-        oldState = *state;
-        setState("Assign Reinforcement");
-        displayTransition(oldState, state, command);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("issueorder");
-    } else if(command == "win") {
-        oldState = *state;
-        setState("Win");
-        displayTransition(oldState, state, command);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("play");
-        nextValidCommands->push_back("end");
-    } else if(command == "play") {
+    /**************************** 
+     * 
+     * 
+     * 
+     * 
+     * Game-Triggered Transition Here 
+     * 
+     * 
+     * 
+     * 
+     ****************************/
+
+
+    if(command == "replay") {
         oldState = *state;
         setState("Win");
         displayTransition(oldState, state, command);
         nextValidCommands->clear();
         ordersToExecute->clear();
         nextValidCommands->push_back("loadmap");
-    } else if(command == "end") {
+    } else if(command == "quit") {
         oldState = *state;
         setState("End");
         displayTransition(oldState, state, command);
@@ -281,18 +249,25 @@ void GameEngine::takeOrder() {
 // Defining the function that encapsulates the inner working of all the transition functions
 void GameEngine::transition(std::string command) {
 
-    bool valid = checkIfValid(command);
+    commandProcessor->getCommand();
+
+    int lastCommandIndex = commandProcessor->commands.size()-1;
+    string command = commandProcessor->commands.at(lastCommandIndex)->getCommand();
+    bool valid = commandProcessor->checkIfValidCommand(command);
+
 
     if(valid) {
 
-        if(validTransition(command)) {
+        if(commandProcessor->validate(command, *nextValidCommands)) {
             doTransition(command);
         } else {
-            std::cout << "Not a valid transition. Cannot " << command << " at state " << *state << std::endl;
+            commandProcessor->commands.at(lastCommandIndex)->saveEffect("Not a valid transition. Cannot " + command + " at state " + state);
+            std::cout << commandProcessor->commands.at(lastCommandIndex)->getEffect() << std::endl;
         }
 
     } else {
-        std::cout << "Command entered is not valid. State remains unchanged." << std::endl;
+        commandProcessor->commands.at(lastCommandIndex)->saveEffect("Command entered is not valid. State remains unchanged.");
+        std::cout << commandProcessor->commands.at(lastCommandIndex)->getEffect() << std::endl;
     }
 
 }
