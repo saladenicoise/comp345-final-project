@@ -2,10 +2,11 @@
 #define Orders
 #include <string>
 #include <vector>
-#include "Map/Map.h"
+#include "../Map/Map.h"
 using namespace std;
 
 class Player;
+class Territory;
 
 class Order {
     private:
