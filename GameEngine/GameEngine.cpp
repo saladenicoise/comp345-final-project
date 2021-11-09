@@ -57,29 +57,6 @@ void GameEngine::setState(std::string state) {
     *this->state = state;
 }
 
-// Defining the support function for checking if the command entered by the player is valid
-bool GameEngine::checkIfValid(std::string command) {
-
-    if (command == "start" || command == "loadmap" || command == "validatemap" || command == "addplayer"
-        || command == "assignreinforcement" || command == "issueorder" || command == "endissueorders"
-        || command == "execorder" || command == "endexecorders" || command == "gamestart" || command == "play" || command == "end"
-        || command == "win") {
-
-        return true;
-    }
-    return false;
-}
-
-// Defining the support function for checking if the command entered by the player leads to a valid transition
-bool GameEngine::validTransition(std::string command) {
-    for(int i = 0; i < nextValidCommands->size(); i++) {
-        if(command == nextValidCommands->at(i)) {
-            return true;
-        }
-    }
-     return false;
-}
-
 // Defining the support function that handles the transition from state to state
 void GameEngine::doTransition(std::string command) {
     std::string oldState;

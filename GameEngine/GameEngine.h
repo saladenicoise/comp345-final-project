@@ -37,12 +37,6 @@ private:
     // declaring a pointer to a command processor object
     CommandProcessor *commandProcessor;
 
-    // declaring a support function for checking if the command entered is correct
-    bool checkIfValid(std::string command);
-
-    // declaring a support function for checking if a transition can occur given the command entered by the user
-    bool validTransition(std::string command);
-
     // declaring a support function for handling the steps associated with the transition
     void doTransition(std::string command);
 
