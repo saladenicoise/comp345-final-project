@@ -81,7 +81,7 @@ public:
     void setState(std::string state);
 
     // declaration for function used for *correctly* transitioning between states
-    void transition(std::string command);
+    void transition();
 
     // declaration for function used for displaying the next valid commands the player can make
     void displayValidCommands() const;

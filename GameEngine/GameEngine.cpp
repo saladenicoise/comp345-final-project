@@ -261,12 +261,12 @@ void GameEngine::takeOrder() {
 }
 
 // Defining the function that encapsulates the inner working of all the transition functions
-void GameEngine::transition(std::string command) {
+void GameEngine::transition() {
 
     commandProcessor->getCommand();
 
     int lastCommandIndex = commandProcessor->commands.size()-1;
-    string command = commandProcessor->commands.at(lastCommandIndex)->getCommand();
+    std::string command = commandProcessor->commands.at(lastCommandIndex)->getCommand();
     bool valid = commandProcessor->checkIfValidCommand(command);
 
 
