@@ -104,13 +104,16 @@ void GameEngine::startupPhase(std::string command) {
     load_map = new MapLoader();
     deck = new Deck(30);
     std::string oldState;
+    std::string transitionString;
+    int lastCommandIndex = commandProcessor->commands.size()-1;
     // cp = new CommandProcessor();
 
     // Start the game
     if(command == "start") {
         oldState = *state;
         setState("start");
-        displayTransition(oldState, state, command);
+        transitionString = displayTransition(oldState, state, command);
+        commandProcessor->commands.at(lastCommandIndex)->saveEffect(transitionString);
         nextValidCommands->clear();
         nextValidCommands->push_back("loadmap");
     } else if (command == "loadmap") {
@@ -128,7 +131,8 @@ void GameEngine::startupPhase(std::string command) {
         }
         oldState = *state;
         setState("maploaded");
-        displayTransition(oldState, state, command);
+        transitionString = displayTransition(oldState, state, command);
+        commandProcessor->commands.at(lastCommandIndex)->saveEffect(transitionString);
         nextValidCommands->clear();
         nextValidCommands->push_back("loadmap");
         nextValidCommands->push_back("validatemap");
@@ -141,7 +145,8 @@ void GameEngine::startupPhase(std::string command) {
         }
         oldState = *state;
         setState("mapvalidated");
-        displayTransition(oldState, state, command);
+        transitionString = displayTransition(oldState, state, command);
+        commandProcessor->commands.at(lastCommandIndex)->saveEffect(transitionString);
         nextValidCommands->clear();
         nextValidCommands->push_back("addplayer");
     } else if (command == "addplayer") {
@@ -158,7 +163,8 @@ void GameEngine::startupPhase(std::string command) {
         cout << "Current Number of players: " << noOfPlayers << endl; // Display number of players
         oldState = *state;
         setState("playersadded");
-        displayTransition(oldState, state, command);
+        transitionString = displayTransition(oldState, state, command);
+        commandProcessor->commands.at(lastCommandIndex)->saveEffect(transitionString);
         nextValidCommands->clear();
 
         // Check if the correct number of players are playing
