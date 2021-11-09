@@ -17,6 +17,7 @@
 class Map;
 class Deck;
 class Player;
+class CommandProcessor;
 
 // Declaring class of GameEngine
 class GameEngine {
@@ -47,9 +48,16 @@ private:
     // declaration of a support function responsible for taking the order the player wishes to make
     void takeOrder();
 
+    // Startup phase method to begin the game
+    void startupPhase(std::string command);
+
+    MapLoader *load_map;
     Map *map;
     vector<Player*> players;
     Deck * deck;
+    // CommandProcessor* cp;
+    int noOfPlayers = 0;
+    bool mapFlag = true;
 
 public:
 
@@ -80,7 +88,6 @@ public:
     // declaration of destructor for class GameEngine
     ~GameEngine();
 
-    void startupPhase();
 };
 
 #endif

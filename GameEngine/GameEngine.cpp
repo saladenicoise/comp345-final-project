@@ -57,8 +57,8 @@ void GameEngine::setState(std::string state) {
 bool GameEngine::checkIfValid(std::string command) {
 
     if (command == "start" || command == "loadmap" || command == "validatemap" || command == "addplayer"
-        || command == "assigncountries" || command == "issueorder" || command == "endissueorders"
-        || command == "execorder" || command == "endexecorders" || command == "play" || command == "end"
+        || command == "assignreinforcement" || command == "issueorder" || command == "endissueorders"
+        || command == "execorder" || command == "endexecorders" || command == "gamestart" || command == "play" || command == "end"
         || command == "win") {
 
         return true;
@@ -78,38 +78,13 @@ bool GameEngine::validTransition(std::string command) {
 
 // Defining the support function that handles the transition from state to state
 void GameEngine::doTransition(std::string command) {
-
     std::string oldState;
 
-    if(command == "start") {
+    startupPhase(command);
+    
+    if (command == "assignreinforcement") {
         oldState = *state;
-        setState("start");
-        displayTransition(oldState, state, command);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("loadmap");
-    } else if (command == "loadmap") {
-        oldState = *state;
-        setState("Map Loaded");
-        displayTransition(oldState, state, command);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("loadmap");
-        nextValidCommands->push_back("validatemap");
-    } else if (command == "validatemap") {
-        oldState = *state;
-        setState("Map Validated");
-        displayTransition(oldState, state, command);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("addplayer");
-    } else if (command == "addplayer") {
-        oldState = *state;
-        setState("Players Added");
-        displayTransition(oldState, state, command);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("addplayer");
-        nextValidCommands->push_back("assigncountries");
-    } else if (command == "assigncountries") {
-        oldState = *state;
-        setState("Assign Reinforcement");
+        setState("assignreinforcement");
         displayTransition(oldState, state, command);
         nextValidCommands->clear();
         nextValidCommands->push_back("issueorder");
@@ -170,10 +145,143 @@ void GameEngine::doTransition(std::string command) {
 
 }
 
+void GameEngine::startupPhase(std::string command) {
+    // Declare variables
+    load_map = new MapLoader();
+    deck = new Deck(30);
+    std::string oldState;
+    // cp = new CommandProcessor();
+
+    // Start the game
+    if(command == "start") {
+        oldState = *state;
+        setState("start");
+        displayTransition(oldState, state, command);
+        nextValidCommands->clear();
+        nextValidCommands->push_back("loadmap");
+    } else if (command == "loadmap") {
+        while(mapFlag) {
+            // cp->getCommand();
+            // getcommand the filename
+            if("../Map/bigeurope.map") { // Check if map exists
+                this->map = load_map->loadMap("../Map/bigeurope.map"); // Load map
+                cout << "\n" << "Map Loaded" << endl;
+                mapFlag = false; // Exit loop
+            } else {
+                cout << "\n\n" << "Invalid map specified! Please Try Again " << endl;
+                continue; // Loop until correct file is given
+            }
+        }
+        oldState = *state;
+        setState("maploaded");
+        displayTransition(oldState, state, command);
+        nextValidCommands->clear();
+        nextValidCommands->push_back("loadmap");
+        nextValidCommands->push_back("validatemap");
+    } else if (command == "validatemap") {
+        // cp->getCommand();
+        if (map->validate()) {
+            cout << "Generated Map is a connected graph!\n" << endl;
+        } else {
+            cout << "Error! Generated Map is not connected graph!\n" << endl;
+        }
+        oldState = *state;
+        setState("mapvalidated");
+        displayTransition(oldState, state, command);
+        nextValidCommands->clear();
+        nextValidCommands->push_back("addplayer");
+    } else if (command == "addplayer") {
+        // cp->getCommand();
+        noOfPlayers++; // Keep track of the number of players
+        // getcommand their name
+        string playername = "Player " + std::to_string(noOfPlayers); // Set playerID
+                
+         // Player creation
+        Player* player = new Player(playername);
+        player->setpID(noOfPlayers);
+        players.push_back(player);
+
+        cout << "Current Number of players: " << noOfPlayers << endl; // Display number of players
+        oldState = *state;
+        setState("playersadded");
+        displayTransition(oldState, state, command);
+        nextValidCommands->clear();
+
+        // Check if the correct number of players are playing
+        if(noOfPlayers < 6)
+            nextValidCommands->push_back("addplayer"); // Stop from adding more than 6 players
+        if(noOfPlayers >= 2) {
+            nextValidCommands->push_back("gamestart"); // Only start playing with min 2 players
+        }
+    } else if (command == "gamestart") { // Start the game
+
+        // Make copy of the territories
+        vector<Territory*> copiedTerritories(map->territories.size());
+        for(int i = 0; i < map->territories.size(); i++){
+            copiedTerritories[i] = map->territories[i];
+        }
+
+        // a) fairly distribute all the territories to the players
+        while(copiedTerritories.size() != 0){
+            for(auto it = players.begin(); it != players.end(); ++it){
+                if(copiedTerritories.size() != 0) {
+                    int random = rand() % copiedTerritories.size();
+                    Territory* randTerritory = copiedTerritories[random];
+                    randTerritory->setOwnerId((*it)->getPID());
+                    (*it)->t.push_back(randTerritory);
+                    copiedTerritories.erase(copiedTerritories.begin() + random);
+                    copiedTerritories.shrink_to_fit();
+                }
+            }
+        }
+
+        // Display players' territories and reinforcement pool
+        for(auto it = players.begin(); it != players.end(); ++it){
+            cout << (*it)->getPlayerName() << ":" << endl;
+            cout << " " << endl;
+
+        // Showing the territories for each player and reinforcement pool
+        cout << "Territories assigned: " << endl;
+        for(int i = 0; i < (*it)->t.size(); i++){
+             cout<< "\t" << *(*it)->t[i] << endl;
+        }
+
+        // c) give 50 initial armies to the players, which are placed in their respective reinforcement pool
+        (*it)->setReinforcementPool(50);
+        cout << "Armies in reinforcement pool: " << (*it)->getReinforcementPool() << endl;
+
+        // d) let each player draw 2 initial cards from the deck using the deck’s draw() method
+        for (int i = 0; i < 2; i++) {
+            deck->draw((*it)->getHand());
+        }
+        cout << "------------------\n" << endl;
+        
+    }            
+        // b) determine randomly the order of play of the players in the game
+        unsigned seed = std::chrono::system_clock::now()
+                            .time_since_epoch()
+                            .count();
+        std::shuffle(std::begin(players), std::end(players), std::default_random_engine());
+
+        cout << "Randomized Players Order" << endl;
+        for (auto p : players) {
+            cout << "pID: " << p->getPID() << endl;
+        }
+
+        // e) switch the game to the play phase
+        oldState = *state;
+        displayTransition(oldState, state, command);
+        nextValidCommands->clear();
+        nextValidCommands->push_back("assignreinforcement");
+    }
+    
+}
+
 // Defining the support function responsible for displaying the current transition taking place
 void GameEngine::displayTransition(std::string state, std::string *newState, std::string command) {
     std::cout << "Current state: " << state << ". Command: " << command
          << ". Transitioning to state: " << *newState << std::endl << std::endl;
+
 }
 
 // Defining the support function responsible for taking in the order the player wishes to make
@@ -238,85 +346,4 @@ GameEngine::~GameEngine() {
     nextValidCommands = nullptr;
     delete ordersToExecute;
     ordersToExecute = nullptr;
-}
-
-void GameEngine::startupPhase(){
-    MapLoader load_map = MapLoader();
-    deck = new Deck(30);
-    // loadmap command here
-    // TO DO: implement loop, the command prompt until correct file is in args
-    try {
-        this->map = load_map.loadMap("../Map/bigeurope.map");
-        // validatemap command here
-        if (map->validate())
-            cout << "Generated Map is a connected graph!\n" << endl;
-        else {
-            cout << "Error! Generated Map is not connected graph!\n" << endl;
-            throw 404;
-        }
-    } catch (int e) {
-        cout << "\n\n" << "Invalid map specified: " << e << endl;
-        exit(EXIT_FAILURE);
-    }
-
-    // addplayer command here
-    // need min 2 players
-    for (int i = 1; i <= 2; i++) {
-        string playername = "Player " + std::to_string(i);
-
-        // Player creation
-        Player* player = new Player(playername);
-        players.push_back(player);
-    }
-
-    // gamestart command here
-    vector<Territory*> copiedTerritories(map->territories.size());
-    for(int i = 0; i < map->territories.size(); i++){
-        copiedTerritories[i] = map->territories[i];
-    }
-
-    // a) fairly distribute all the territories to the players
-    while(copiedTerritories.size() != 0){
-        for(auto it = players.begin(); it != players.end(); ++it){
-            if(copiedTerritories.size() != 0) {
-                int random = rand() % copiedTerritories.size();
-                Territory* randTerritory = copiedTerritories[random];
-                randTerritory->setPlayer(&*(*it));
-                (*it)->t.push_back(randTerritory);
-                copiedTerritories.erase(copiedTerritories.begin() + random);
-                copiedTerritories.shrink_to_fit();
-            }
-        }
-    }
-
-    // Display players' territories, reinforcement pool
-    for(auto it = players.begin(); it != players.end(); ++it){
-        cout << (*it)->getPlayerName() << ":" << endl;
-        cout << " " << endl;
-
-        // Showing the territories for each player and reinforcement pool
-        cout << "Territories assigned: " << endl;
-        for(int i = 0; i < (*it)->t.size(); i++){
-             cout<< "\t" << *(*it)->t[i] << endl;
-        }
-
-        // c) give 50 initial armies to the players, which are placed in their respective reinforcement pool
-        (*it)->setReinforcementPool(50);
-        cout << "Armies in reinforcement pool: " << (*it)->getReinforcementPool() << endl;
-
-        // d) let each player draw 2 initial cards from the deck using the deck’s draw() method
-        for (int i = 0; i < 2; i++) {
-            deck->draw((*it)->getHand());
-        }
-        cout << "------------------\n" << endl;
-        
-    }
-    // b) determine randomly the order of play of the players in the game
-    unsigned seed = std::chrono::system_clock::now()
-                        .time_since_epoch()
-                        .count();
-    std::shuffle(std::begin(players), std::end(players), std::default_random_engine());
-
-    // e) switch the game to the play phase
-
 }
