@@ -8,9 +8,9 @@
 #include <iostream>
 #include <ostream> 
 
-#include "Orders/Orders.h"
-#include "Map/Map.h"
-#include "Cards/Cards.h"
+#include "../Orders/Orders.h"
+#include "../Map/Map.h"
+#include "../Cards/Cards.h"
 
 class Player;
 class Territory;
@@ -43,6 +43,7 @@ class Player //this is the Player class
         void setTerritories(vector<Territory*> newTerritories);
         int getReinforcementPool();
         void setReinforcementPool(int pool);
+        void setpID(int pID);
 
     private: // data members
         string playerName;
