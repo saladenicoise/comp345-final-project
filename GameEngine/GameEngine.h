@@ -44,7 +44,7 @@ private:
     void doTransition(std::string command);
 
     // declaration of a support function used for displaying the current transition taking place
-    void displayTransition(std::string state, std::string* newState, std::string command);
+    std::string displayTransition(std::string state, std::string* newState, std::string command);
 
     // declaration of a support function responsible for taking the order the player wishes to make
     void takeOrder();
