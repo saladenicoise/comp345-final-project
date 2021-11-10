@@ -59,7 +59,8 @@ private:
     vector<Player*> players;
     Deck * deck;
     int noOfPlayers = 0;
-    string filename;
+    string mapFilename;
+    string commandsFilename;
     string playerName;
     
     

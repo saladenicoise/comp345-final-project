@@ -36,6 +36,19 @@ public:
 
 };
 
+class FileLineReader {
+    FileLineReader();
+    ~FileLineReader();
+    void readLineFromFile(string fileName);
+};
 
+class FileCommandProcessorAdapter : public CommandProcessor {
+private:
+    FileLineReader* flr;
+public:
+    FileCommandProcessorAdapter();
+    ~FileCommandProcessorAdapter();
+    string readCommand();
+};
 
 #endif

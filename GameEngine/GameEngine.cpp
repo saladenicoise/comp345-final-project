@@ -119,8 +119,8 @@ void GameEngine::startupPhase(std::string command) {
         nextValidCommands->clear();
         nextValidCommands->push_back("loadmap");
     } else if (command == "loadmap") {
-        if(fileExist(filename)) { // Check if map exists
-            this->map = load_map->loadMap(filename); // Load map
+        if(fileExist(mapFilename)) { // Check if map exists
+            this->map = load_map->loadMap(mapFilename); // Load map
             cout << "\n" << "Map Loaded" << endl;
             oldState = *state;
             setState("maploaded");
@@ -288,7 +288,7 @@ void GameEngine::transition() {
         string token = command.substr(command.find(delimiter)).erase(0,delimiter.length());;
         command = command.substr(0,command.find(delimiter));
         if(getState() == "start" || getState() == "maploaded") {
-            filename = token;
+            mapFilename = token;
         }
         else if(getState() == "mapvalidated" || getState() == "playersadded") {
             playerName = token;
