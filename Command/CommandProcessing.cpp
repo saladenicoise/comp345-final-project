@@ -50,7 +50,6 @@ CommandProcessor::~CommandProcessor() {
         delete commands.at(i);
         commands.at(i) = nullptr;
     }
-    cout << "Destroyed CommandProcessor Object Instance" << endl;
 }
 
 string CommandProcessor::readCommand() {
