@@ -105,74 +105,85 @@ void GameEngine::startupPhase(std::string command) {
     deck = new Deck(30);
     std::string oldState;
     std::string transitionString;
-    int lastCommandIndex = commandProcessor->commands.size()-1;
-    // cp = new CommandProcessor();
 
     // Start the game
     if(command == "start") {
         oldState = *state;
         setState("start");
         transitionString = displayTransition(oldState, state, command);
-        commandProcessor->commands.at(lastCommandIndex)->saveEffect(transitionString);
+        commandProcessor->commands.back()->saveEffect(transitionString);
         nextValidCommands->clear();
         nextValidCommands->push_back("loadmap");
     } else if (command == "loadmap") {
-        while(mapFlag) {
-            // cp->getCommand();
-            // getcommand the filename
-            if("../Map/bigeurope.map") { // Check if map exists
-                this->map = load_map->loadMap("../Map/bigeurope.map"); // Load map
-                cout << "\n" << "Map Loaded" << endl;
-                mapFlag = false; // Exit loop
-            } else {
-                cout << "\n\n" << "Invalid map specified! Please Try Again " << endl;
-                continue; // Loop until correct file is given
-            }
+        if(fileExist(filename)) { // Check if map exists
+            this->map = load_map->loadMap(filename); // Load map
+            cout << "\n" << "Map Loaded" << endl;
+            oldState = *state;
+            setState("maploaded");
+            transitionString = displayTransition(oldState, state, command);
+            commandProcessor->commands.back()->saveEffect(transitionString);
+            nextValidCommands->clear();
+            nextValidCommands->push_back("loadmap");
+            nextValidCommands->push_back("validatemap");
+        } else {
+            cout << "\n\n" << "Invalid map specified! Please Try Again." << endl;
+            oldState = *state;
+            setState("start");
+            transitionString = displayTransition(oldState, state, command);
+            commandProcessor->commands.back()->saveEffect(transitionString);
+            nextValidCommands->clear();
+            nextValidCommands->push_back("loadmap");
         }
-        oldState = *state;
-        setState("maploaded");
-        transitionString = displayTransition(oldState, state, command);
-        commandProcessor->commands.at(lastCommandIndex)->saveEffect(transitionString);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("loadmap");
-        nextValidCommands->push_back("validatemap");
     } else if (command == "validatemap") {
-        // cp->getCommand();
         if (map->validate()) {
             cout << "Generated Map is a connected graph!\n" << endl;
+            oldState = *state;
+            setState("mapvalidated");
+            transitionString = displayTransition(oldState, state, command);
+            commandProcessor->commands.back()->saveEffect(transitionString);
+            nextValidCommands->clear();
+            nextValidCommands->push_back("addplayer");
         } else {
             cout << "Error! Generated Map is not connected graph!\n" << endl;
+            setState("maploaded");
+            transitionString = displayTransition(oldState, state, command);
+            commandProcessor->commands.back()->saveEffect(transitionString);
+            nextValidCommands->clear();
+            nextValidCommands->push_back("loadmap");
+            nextValidCommands->push_back("validatemap");
         }
-        oldState = *state;
-        setState("mapvalidated");
-        transitionString = displayTransition(oldState, state, command);
-        commandProcessor->commands.at(lastCommandIndex)->saveEffect(transitionString);
-        nextValidCommands->clear();
-        nextValidCommands->push_back("addplayer");
+
     } else if (command == "addplayer") {
-        // cp->getCommand();
-        noOfPlayers++; // Keep track of the number of players
-        // getcommand their name
-        string playername = "Player " + std::to_string(noOfPlayers); // Set playerID
-                
-         // Player creation
-        Player* player = new Player(playername);
-        player->setpID(noOfPlayers);
-        players.push_back(player);
+        string playername = playerName;
+        if(playerName.empty()) {
+            cout << "\n" << "No player name specified! Please Try Again." << endl;
+            oldState = *state;
+            setState("mapvalidated");
+            transitionString = displayTransition(oldState, state, command);
+            commandProcessor->commands.back()->saveEffect(transitionString);
+            nextValidCommands->clear();
+            nextValidCommands->push_back("addplayer");
+        } else {
+            noOfPlayers++; // Keep track of the number of players
+            // Player creation
+            Player* player = new Player(playername);
+            player->setpID(noOfPlayers);
+            players.push_back(player);
 
-        cout << "Current Number of players: " << noOfPlayers << endl; // Display number of players
-        oldState = *state;
-        setState("playersadded");
-        transitionString = displayTransition(oldState, state, command);
-        commandProcessor->commands.at(lastCommandIndex)->saveEffect(transitionString);
-        nextValidCommands->clear();
+            cout << "Current Number of players: " << noOfPlayers << endl; // Display number of players
+            oldState = *state;
+            setState("playersadded");
+            transitionString = displayTransition(oldState, state, command);
+            commandProcessor->commands.back()->saveEffect(transitionString);
+            nextValidCommands->clear();
 
-        // Check if the correct number of players are playing
-        if(noOfPlayers < 6)
-            nextValidCommands->push_back("addplayer"); // Stop from adding more than 6 players
-        if(noOfPlayers >= 2) {
-            nextValidCommands->push_back("gamestart"); // Only start playing with min 2 players
-        }
+            // Check if the correct number of players are playing
+            if(noOfPlayers < 6)
+                nextValidCommands->push_back("addplayer"); // Stop from adding more than 6 players
+            if(noOfPlayers >= 2)
+                nextValidCommands->push_back("gamestart"); // Only start playing with min 2 players
+        }        
+
     } else if (command == "gamestart") { // Start the game
 
         // Make copy of the territories
@@ -231,6 +242,7 @@ void GameEngine::startupPhase(std::string command) {
         // e) switch the game to the play phase
         oldState = *state;
         displayTransition(oldState, state, command);
+        std::cout << "\nNow Entering the Play Phase!\n" << std::endl;
         nextValidCommands->clear();
         nextValidCommands->push_back("assignreinforcement");
     }
@@ -264,24 +276,36 @@ void GameEngine::takeOrder() {
 void GameEngine::transition() {
 
     commandProcessor->getCommand();
-
-    int lastCommandIndex = commandProcessor->commands.size()-1;
-    std::string command = commandProcessor->commands.at(lastCommandIndex)->getCommand();
+   
+    string command = commandProcessor->commands.back()->getCommand();
+    string delimiter = " ";
+    
+    if(command.find(' ') != std::string::npos) {
+        string token = command.substr(command.find(delimiter)).erase(0,delimiter.length());;
+        command = command.substr(0,command.find(delimiter));
+        if(getState() == "start" || getState() == "maploaded") {
+            filename = token;
+        }
+        else if(getState() == "mapvalidated" || getState() == "playersadded") {
+            playerName = token;
+        }
+        
+    }
     bool valid = commandProcessor->checkIfValidCommand(command);
-
 
     if(valid) {
 
         if(validTransition(command)) {
             doTransition(command);
         } else {
-            commandProcessor->commands.at(lastCommandIndex)->saveEffect("Not a valid transition. Cannot " + command + " at state " + *state);
-            std::cout << commandProcessor->commands.at(lastCommandIndex)->getEffect() << std::endl;
+            commandProcessor->commands.back()->saveEffect("Not a valid transition. Cannot " + command + " at state " + *state);
+            std::cout << commandProcessor->commands.back()->getEffect() << std::endl;
+            
         }
 
     } else {
-        commandProcessor->commands.at(lastCommandIndex)->saveEffect("Command entered is not valid. State remains unchanged.");
-        std::cout << commandProcessor->commands.at(lastCommandIndex)->getEffect() << std::endl;
+        commandProcessor->commands.back()->saveEffect("Command entered is not valid. State remains unchanged.");
+        std::cout << commandProcessor->commands.back()->getEffect() << std::endl;
     }
 
 }
@@ -316,4 +340,9 @@ GameEngine::~GameEngine() {
     nextValidCommands = nullptr;
     delete ordersToExecute;
     ordersToExecute = nullptr;
+}
+
+bool GameEngine::fileExist (const std::string& name) {
+    ifstream f(name.c_str());
+    return f.good();
 }

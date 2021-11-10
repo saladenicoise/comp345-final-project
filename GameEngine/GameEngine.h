@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
 // For random shuffle
 #include <algorithm>
 #include <random>
@@ -52,14 +53,16 @@ private:
     // Startup phase method to begin the game
     void startupPhase(std::string command);
 
+    // Variable declaration
     MapLoader *load_map;
     Map *map;
     vector<Player*> players;
     Deck * deck;
-    // CommandProcessor* cp;
     int noOfPlayers = 0;
-    bool mapFlag = true;
-
+    string filename;
+    string playerName;
+    
+    
 public:
 
     // default constructor declaration.
@@ -91,6 +94,8 @@ public:
 
     // declaration of destructor for class GameEngine
     ~GameEngine();
+
+    bool fileExist (const std::string& name);
 
 };
 

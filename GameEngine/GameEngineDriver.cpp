@@ -14,10 +14,7 @@ int main() {
         if(g.getState() != "pregame")
             g.displayValidCommands();
 
-        std::cout << "Enter your desired command: ";
-        std::cin >> command;
-
-        g.transition(command);
+        g.transition();
     }
 
     return 0;
