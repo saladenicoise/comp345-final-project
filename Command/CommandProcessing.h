@@ -2,6 +2,7 @@
 #define COMMANDPROCESSING_H
 #include <iostream>
 #include <vector>
+#include <fstream>
 using namespace std;
 
 class Command {
@@ -37,16 +38,20 @@ public:
 };
 
 class FileLineReader {
-    FileLineReader();
+private:
+    string filename;
+    fstream myFile;
+public:
+    FileLineReader(string filename);
     ~FileLineReader();
-    void readLineFromFile(string fileName);
+    string readLineFromFile();
 };
 
 class FileCommandProcessorAdapter : public CommandProcessor {
 private:
     FileLineReader* flr;
 public:
-    FileCommandProcessorAdapter();
+    FileCommandProcessorAdapter(string filename);
     ~FileCommandProcessorAdapter();
     string readCommand();
 };

@@ -93,3 +93,38 @@ bool CommandProcessor::validate(string command, vector<string> nextValidCommands
     }
     return false;
 }
+
+FileLineReader::FileLineReader(string filename) {
+    this->filename = filename;
+}
+
+FileLineReader::~FileLineReader(){}
+
+string FileLineReader::readLineFromFile () {
+    string command;
+    if(myFile.is_open()) {
+        if(!getline(myFile, command)) {
+            myFile.close();
+        }
+    } else {
+        command = "File is Closed.";
+    }
+    
+    return command;
+}
+
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(string filename) {
+    flr = new FileLineReader(filename);
+}
+
+FileCommandProcessorAdapter::~FileCommandProcessorAdapter() {
+    delete flr;
+    flr = nullptr;
+}
+
+string FileCommandProcessorAdapter::readCommand() {
+    string command = flr->readLineFromFile();
+
+    return command;
+}
+
