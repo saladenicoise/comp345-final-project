@@ -60,7 +60,7 @@ private:
     Deck * deck;
     int noOfPlayers = 0;
     string mapFilename;
-    string commandsFilename;
+    std::string commandsFilename;
     string playerName;
     
     
@@ -80,6 +80,9 @@ public:
 
     // getter function for commandProcessor
     CommandProcessor getCommandProcessor();
+
+    // getter function for commandsFilename
+    std::string getCommandsFileName();
 
     // setter function for attribute state declaration
     void setState(std::string state);

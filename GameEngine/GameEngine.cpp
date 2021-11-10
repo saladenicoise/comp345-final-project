@@ -61,6 +61,10 @@ CommandProcessor GameEngine::getCommandProcessor() {
     return *commandProcessor;
 }
 
+std::string GameEngine::getCommandsFileName() {
+    return commandsFilename;
+}
+
 // Defining the support function for checking if the command entered by the player leads to a valid transition
 bool GameEngine::validTransition(std::string command) {
     return commandProcessor->validate(command, *nextValidCommands);
