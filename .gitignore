@@ -33,7 +33,3 @@
 
 #VSCODE config files
 .vscode
-
-.idea
-/cmake-build-debug/
-/GameEngine/cmake-build-debug/
