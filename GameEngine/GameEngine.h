@@ -67,7 +67,7 @@ private:
 public:
 
     // default constructor declaration.
-    GameEngine();
+    GameEngine(string mode);
 
     // copy constructor declaration
     GameEngine(const GameEngine &gameEngine);

@@ -1,12 +1,18 @@
 #include "GameEngine.h"
 
 // Defining the default constructor for GameEngine class
-GameEngine::GameEngine() {
+GameEngine::GameEngine(string mode) {
     state = new std::string("pregame");
     nextValidCommands = new std::vector<std::string>;
     nextValidCommands->push_back("start");
     ordersToExecute = new std::vector<std::string>;
     commandProcessor = new CommandProcessor();
+    if(mode == "console") {
+       commandProcessor = new CommandProcessor();
+    } else {
+        FileLineReader *flr = new FileLineReader(mode);
+        commandProcessor = new FileCommandProcessorAdapter(*flr);
+    }
 }
 
 // Defining the copy constructor for the GameEngine class
