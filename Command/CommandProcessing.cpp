@@ -96,6 +96,7 @@ bool CommandProcessor::validate(string command, vector<string> nextValidCommands
 
 FileLineReader::FileLineReader(string filename) {
     this->filename = filename;
+    myFile.open(filename);
 }
 
 FileLineReader::~FileLineReader(){}
@@ -113,8 +114,8 @@ string FileLineReader::readLineFromFile () {
     return command;
 }
 
-FileCommandProcessorAdapter::FileCommandProcessorAdapter(string filename) {
-    flr = new FileLineReader(filename);
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileLineReader flr) {
+    this->flr = new FileLineReader(flr);
 }
 
 FileCommandProcessorAdapter::~FileCommandProcessorAdapter() {

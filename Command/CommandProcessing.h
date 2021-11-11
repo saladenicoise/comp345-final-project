@@ -24,7 +24,7 @@ public:
 class CommandProcessor {
 
 private:
-    string readCommand();
+    virtual string readCommand();
     void saveCommand(string command);
 public:
     vector<Command*> commands;
@@ -50,10 +50,13 @@ public:
 class FileCommandProcessorAdapter : public CommandProcessor {
 private:
     FileLineReader* flr;
+
 public:
-    FileCommandProcessorAdapter(string filename);
+    FileCommandProcessorAdapter(FileLineReader flr);
     ~FileCommandProcessorAdapter();
-    string readCommand();
+    virtual string readCommand() override;
+
+
 };
 
 #endif
