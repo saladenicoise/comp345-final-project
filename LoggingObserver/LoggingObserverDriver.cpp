@@ -24,10 +24,11 @@ int main() {
     FileLineReader* flr = new FileLineReader("commands.txt");
     FileCommandProcessorAdapter* fileCommandProcessorAdapter = new FileCommandProcessorAdapter(*flr);
     Command* command = new Command;
-    //NEED TO ADD GAMEENGINE THIS THIS DRIVER WHEN ITS DONE.
+
     GameEngine* gameEngine = new GameEngine("console");
     gameEngine->attach(logObserver);
-    gameEngine->transition();
+    cout << "type start to transition" << endl;
+    gameEngine->transition(); //Type start into console, since its the beginning of a gameEngine.
     commandProcessor->attach(logObserver);
     fileCommandProcessorAdapter->attach(logObserver);
     command->attach(logObserver);
@@ -36,7 +37,8 @@ int main() {
     fileCommandProcessorAdapter->getCommand();
     fileCommandProcessorAdapter->getCommand();
     command->saveEffect("This is a sample effect being saved by command->saveEffect");
-    commandProcessor->getCommand(); //Calls Save Command
+    cout << "type a command of your choice, it doesn't have to be a real command but it will be added to the log file." << endl;
+    commandProcessor->getCommand(); //Calls Save Command (You will need to type a command to save into the console. Doesn't check if it's valid in this case.)
     orderList->addOrder(blockade);
     blockade->execute(); //Is a type of order.
 
