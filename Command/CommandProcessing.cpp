@@ -69,7 +69,7 @@ string CommandProcessor::readCommand() {
 }
 
 std::string CommandProcessor::stringToLog() {
-    return commands.back()->getCommand();
+    return "Command Saved: " + commands.back()->getCommand();
 }
 
 void CommandProcessor::saveCommand(string commandString) {

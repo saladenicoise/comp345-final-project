@@ -8,6 +8,7 @@
 #include "../Orders/Orders.h"
 #include "../Command/CommandProcessing.h"
 #include "../Player/Player.h"
+#include "../GameEngine/GameEngine.h"
 int main() {
     LogObserver* logObserver = new LogObserver;
     OrderList* orderList = new OrderList;
@@ -24,9 +25,9 @@ int main() {
     FileCommandProcessorAdapter* fileCommandProcessorAdapter = new FileCommandProcessorAdapter(*flr);
     Command* command = new Command;
     //NEED TO ADD GAMEENGINE THIS THIS DRIVER WHEN ITS DONE.
-    //GameEngine* gameEngine = new gameEngine;
-    //gameEngine->attach(logObserver);
-    //gameEngine->transition();
+    GameEngine* gameEngine = new GameEngine("console");
+    gameEngine->attach(logObserver);
+    gameEngine->transition();
     commandProcessor->attach(logObserver);
     fileCommandProcessorAdapter->attach(logObserver);
     command->attach(logObserver);
