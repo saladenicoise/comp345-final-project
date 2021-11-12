@@ -255,7 +255,8 @@ void GameEngine::startupPhase(std::string command) {
 
         // e) switch the game to the play phase
         oldState = *state;
-        displayTransition(oldState, state, command);
+        setState("Assign Reinforcement");
+        transitionString = displayTransition(oldState, state, command);
         std::cout << "\nNow Entering the Play Phase!\n" << std::endl;
         nextValidCommands->clear();
         nextValidCommands->push_back("assignreinforcement");

@@ -105,7 +105,7 @@ bool CommandProcessor::validate(string command, vector<string> nextValidCommands
 
 FileLineReader::FileLineReader(string filename) {
     this->filename = filename;
-    myFile.open(filename);
+    myFile.open(filename, ios::in | ios::binary);
 }
 
 FileLineReader::~FileLineReader(){}
@@ -113,13 +113,17 @@ FileLineReader::~FileLineReader(){}
 string FileLineReader::readLineFromFile () {
     string command;
     if(myFile.is_open()) {
-        if(!getline(myFile, command)) {
+        if(myFile) {
+            getline(myFile, command);
+            cout << "This is the command: " << command << endl;
+        } else {
+            cout << "Closing File" << endl;
             myFile.close();
         }
     } else {
         command = "File is Closed.";
     }
-    
+
     return command;
 }
 
