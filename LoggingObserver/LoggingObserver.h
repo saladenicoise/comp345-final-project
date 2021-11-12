@@ -32,12 +32,15 @@ public:
 };
 
 
-class LogObserver: Observer {
+class LogObserver: public Observer {
 public:
     std::ofstream gameLog;
     LogObserver();
+    LogObserver(LogObserver& logObserver);
+    LogObserver& operator= (const LogObserver& logObserver);
     ~LogObserver();
     void update(ILoggable*);
+    friend std::ostream& operator<< (std::ostream& os, const LogObserver& logObserver);
 };
 
 
