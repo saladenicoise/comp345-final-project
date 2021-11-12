@@ -47,6 +47,7 @@ private:
     fstream myFile;
 public:
     FileLineReader(string filename);
+    FileLineReader(const FileLineReader& flr);
     ~FileLineReader();
     string readLineFromFile();
 };

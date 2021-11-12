@@ -108,6 +108,11 @@ FileLineReader::FileLineReader(string filename) {
     myFile.open(filename, ios::in | ios::binary);
 }
 
+FileLineReader::FileLineReader(const FileLineReader& flr) {
+    filename = flr.filename;
+    myFile.open(filename);
+}
+
 FileLineReader::~FileLineReader(){}
 
 string FileLineReader::readLineFromFile () {
