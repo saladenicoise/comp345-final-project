@@ -134,6 +134,11 @@ int main() {
     for(int i =0; i<p2->getTerritories().size(); i++){
         cout << p2->getTerritories()[i]->countryName << endl;
     }
+    cout << "Territory Was Added to neutral player" << endl;
+    cout << "Player 3 (Neutral Player) owned territories after executing blockade: " << endl;
+    for(int i =0; i<p3->getTerritories().size(); i++){
+        cout << p3->getTerritories()[i]->countryName << endl;
+    }
 
     //Test the validate() and execute() for Negotiate
     Negotiate* negotiateOrder = new Negotiate(p1, p2);

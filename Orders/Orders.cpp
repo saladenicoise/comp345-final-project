@@ -603,7 +603,6 @@ Territory* Blockade::getTarget() {
     return target;
 }
 
-//Always return true, since we havent implemented the order functionality yet
 bool Blockade::validate() {
     for(int i = 0; i < sourcePlayer->getTerritories().size(); i++) {
         if(sourcePlayer->getTerritories()[i] == target) {//Is it part of our territories?
@@ -633,7 +632,7 @@ void Blockade::execute() {
             }
         }
         sourcePlayer->setTerritories(sourceOwnedTer);
-        vector<Territory*> neutralOwnerTer = sourcePlayer->getTerritories();
+        vector<Territory*> neutralOwnerTer = neutralPlayer->getTerritories();
         neutralOwnerTer.push_back(target); //Add to neutral player
         neutralPlayer->setTerritories(neutralOwnerTer);
         notify(this);
