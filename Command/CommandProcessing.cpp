@@ -120,7 +120,6 @@ string FileLineReader::readLineFromFile () {
     if(myFile.is_open()) {
         if(myFile) {
             getline(myFile, command);
-            cout << "This is the command: " << command << endl;
         } else {
             cout << "Closing File" << endl;
             myFile.close();
