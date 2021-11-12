@@ -1,13 +1,14 @@
 #include "Orders.h"
-
+#include "../Map/Map.h"
 using namespace std;
 #include <iostream>
 #include <cmath> //Necessary to round 
 
+class Player;
 
-class GameEngine;
+
 //Order Class
-Order::Order() {
+Order::Order() : ILoggable(), Subject() {
     this->orderType = "order";
 }
 
@@ -22,6 +23,10 @@ Order::Order(const Order &order) {
 
 //Destructor
 Order::~Order() {
+}
+
+std::string Order::stringToLog() { //shouldn't occur but necessary since order can't be abstract
+    return this->getOrderType();
 }
 
 string Order::getOrderType() {
@@ -41,6 +46,7 @@ Order &Order::operator=(const Order &order) {
     this->orderType = order.orderType;
     return *this;
 }
+
 
 //OrderList Class, nothing speciall is needed here and we dont have a default value
 OrderList::OrderList() {}
@@ -92,7 +98,14 @@ void OrderList::setOrderList(vector<Order *> orderList) {
 //Add Order
 void OrderList::addOrder(Order *order) {
     orderList.push_back(order);
+    notify(this);
 }
+
+std::string OrderList::stringToLog() {
+    return orderList.back()->getOrderType() + " order added to order list.";
+}
+
+
 
 //Remove Order
 void OrderList::deleteOrder(int index) {
@@ -237,11 +250,16 @@ bool Deploy::validate() {
     }
 }
 
+std::string Deploy::stringToLog() {
+    return to_string(numtoDeploy) + " troops moved to " + targetTerritory->countryName + " by player " + sourcePlayer->getPlayerName();
+}
+
 void Deploy::execute() {
     if(validate()) {
         //Set the number of troops in the territory to the current plus the new number to deploy
         targetTerritory->armyCount += numtoDeploy;
         sourcePlayer->setReinforcementPool(sourcePlayer->getReinforcementPool()-numtoDeploy);
+        notify(this);
         cout << "Deploy Order Executed" << endl;
     }else{
         cout << "Invalid Deploy Order" << endl;
@@ -368,6 +386,9 @@ bool Advance::validate() {
     }
 }
 
+std::string Advance::stringToLog() {
+  return getAttackTarget()->countryName + " is now owned by " + getAttackTarget()->getOwningPlayer()->getPlayerName() + " and has an army count of " + to_string(getAttackTarget()->armyCount) + " \n" + attackSource->countryName + " now has an army count of " + to_string(attackSource->armyCount);
+}
 void Advance::execute() {
     if(validate()) {
         cout << "Advance Order Executed" << endl;
@@ -512,10 +533,15 @@ bool Bomb::validate() {
     return false; //If target not in adjacency list of every territory, then return false
 }
 
+
+std::string Bomb::stringToLog() {
+    return getTarget()->countryName + " has been bombed lowering its army count to " + to_string(getTarget()->armyCount);
+}
 void Bomb::execute() {
     if(validate()) {
         target->armyCount /= 2;
         cout << "Bomb Order Executed" << endl;
+        notify(this);
     }else{
         cout << "Invalid Bomb Order" << endl;
     }
@@ -580,6 +606,9 @@ bool Blockade::validate() {
     }
     return false; //Not part of our territories
 }
+std::string Blockade::stringToLog() {
+    return target->getOwningPlayer()->getPlayerName() + " has lost ownership of "  + target->countryName + " to the neutral player, its army count has doubled to " + to_string(target->armyCount);
+}
 
 void Blockade::execute() {
     if (validate()) {
@@ -598,7 +627,7 @@ void Blockade::execute() {
             }
         }
         sourcePlayer->setTerritories(sourceOwnedTer);
-    
+        notify(this);
     }else{
         cout << "Invalid Blockade Order" << endl;
     }
@@ -690,12 +719,17 @@ bool Airlift::validate() {
     }
 }
 
+std::string Airlift::stringToLog() {
+    return to_string(numOfArmies) + " moved from " + source->countryName + " to " + dest->countryName;
+}
+
 void Airlift::execute() {
     if (validate()) {
         cout << "Airlift Order Executed" << endl;
         //Move
         source->armyCount -= numOfArmies;
         dest->armyCount += numOfArmies;
+        notify(this);
     }else{
         cout << "Invalid Airlift Order" << endl;
     }
@@ -763,6 +797,7 @@ bool Negotiate::validate() {
 
 void Negotiate::execute() {
     if (validate()) {
+        notify(this);
         cout << "Negotiate Order Executed" << endl;
         //Players get added to each other's do not attack list
         vector<Player*> noAttackP;
@@ -783,6 +818,9 @@ void Negotiate::execute() {
     }
 }
 
+std::string Negotiate::stringToLog() {
+    return this->getSourcePlayer()->getPlayerName() + " has negotiated with " + this->getTargetPlayer()->getPlayerName();
+}
 //Stream insertion operator overload
 ostream &operator<<(ostream &strm, Negotiate &negotiate) {
     return strm << "Order Type: " << negotiate.getOrderType();

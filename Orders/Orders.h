@@ -3,12 +3,14 @@
 #include <string>
 #include <vector>
 #include "../Map/Map.h"
+#include "../Player/Player.h"
+#include "../LoggingObserver/LoggingObserver.h"
 using namespace std;
 
 class Player;
 class Territory;
 
-class Order {
+class Order : public ILoggable, public Subject {
     private:
         string orderType;
     
@@ -29,9 +31,14 @@ class Order {
         virtual Order &operator=(const Order &order);
         //Execute Order Function (virtual so it can be overriden)
         virtual void execute();
+
+        virtual std::string stringToLog();
+
+
+
 };
 
-class OrderList {
+class OrderList : public ILoggable, public Subject{
     //Our list of orders
     private:
         //The actual container for the list
@@ -63,6 +70,9 @@ class OrderList {
         friend ostream &operator<<(ostream &stream, OrderList &orderList);
         //Assignment operation
         OrderList &operator=(const OrderList &orderList);
+
+        std::string stringToLog();
+
 };
 
 // List of necessary orders: deploy, advance, bomb, blockade, airlift, and negotiate. Must contain execute and validate function, nothing else is needed at this point (10/4/2021)
@@ -105,6 +115,9 @@ class Deploy : public Order {
 
         //Assignment Operator
         Deploy &operator=(const Deploy &dep);
+
+        std::string stringToLog();
+
 };
 
 class Advance : public Order {
@@ -149,6 +162,9 @@ class Advance : public Order {
 
         //Assignment Operator
         Advance &operator=(const Advance &advance);
+
+        std::string stringToLog();
+
 };
 
 class Bomb : public Order {
@@ -184,6 +200,9 @@ class Bomb : public Order {
 
         //Assignment Operator
         Bomb &operator=(const Bomb &bomb);
+
+         std::string stringToLog();
+
 };
 
 class Blockade : public Order {
@@ -219,6 +238,9 @@ class Blockade : public Order {
 
         //Assignment Operator
         Blockade &operator=(const Blockade &blockade);
+
+        std::string stringToLog();
+
 };
 
 class Airlift : public Order {
@@ -260,6 +282,9 @@ class Airlift : public Order {
 
         //Assignment Operator
         Airlift &operator=(const Airlift &airLift);
+
+        std::string stringToLog();
+
 };
 
 class Negotiate : public Order {
@@ -295,5 +320,8 @@ class Negotiate : public Order {
 
         //Assignment Operator
         Negotiate &operator=(const Negotiate &negotiate);
+
+        std::string stringToLog();
+
 };
 #endif

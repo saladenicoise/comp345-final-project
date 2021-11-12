@@ -12,6 +12,11 @@
 using namespace std;
 
 
+Player* Territory::getOwningPlayer() {
+    Player* temp;
+    return temp;
+}
+
 Territory::Territory(string countryName, int continentNumber, int countryNumber){ //Territory constructor for default player/armycount
     this->countryName = countryName;
     this->continentNumber = continentNumber;
