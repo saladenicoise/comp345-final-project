@@ -8,16 +8,25 @@ Player::Player()
 {
     this->h = new Hand();
     this->olst = new OrderList();
+    this->isNeutral = 1;
 } //default constructor 
+
+Player::Player(string playerName, int isNeutral) {
+    this->playerName = playerName;
+    this->h = new Hand();
+    this->olst = new OrderList();
+    this->isNeutral = isNeutral;
+}
 
 Player::Player(string playerName)
 {
     this->playerName = playerName;
     this->h = new Hand();
     this->olst = new OrderList();
+    this->isNeutral = 1;
 }
 
-Player::Player(string playerName,int pid, vector<Territory*> t, Hand* h, OrderList* o, vector<Player*> noAttack) // parameterized constructor for Player class
+Player::Player(string playerName,int pid, vector<Territory*> t, Hand* h, OrderList* o, vector<Player*> noAttack, int isNeutral) // parameterized constructor for Player class
 {
     this->playerName = playerName;
     this->pid = pid;
@@ -25,6 +34,7 @@ Player::Player(string playerName,int pid, vector<Territory*> t, Hand* h, OrderLi
     this->h = h;
     this->olst = o;
     this->cannotAttack = noAttack;
+    this->isNeutral = isNeutral;
 }
 
 Player::Player(const Player& p) //copy constructor
@@ -162,4 +172,16 @@ void Player::setReinforcementPool(int pool) { // set pool size
 
 void Player::setpID(int pID) { //sets players id
     this->pid = pID;
+}
+
+int Player::getNeutral() {
+    return this->isNeutral;
+}
+
+int Player::getGetCard() {
+    return this->getCard;
+}
+
+void Player::setGetCard(int getCard) {
+    this->getCard = getCard;
 }

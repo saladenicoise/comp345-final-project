@@ -211,11 +211,12 @@ class Blockade : public Order {
         string orderType;
         Player* sourcePlayer;
         Territory* target;
+        Player* neutralPlayer;
 
     public:
         //Constructors
         Blockade();
-        Blockade(Player *playerIn, Territory *targetIn);
+        Blockade(Player *playerIn, Territory *targetIn, Player *neutralPlayer);
         Blockade(const Blockade &blockade);
         //Destructor
         ~Blockade();

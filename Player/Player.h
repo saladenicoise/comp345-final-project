@@ -24,7 +24,8 @@ class Player //this is the Player class
     public:
         Player(); //default constructor
         Player(string playerName);
-        Player(string playerName, int pid, vector<Territory*> t, Hand* h, OrderList* olst, vector<Player*> noAttack); //constructor  
+        Player(string playerName, int isNeutral);
+        Player(string playerName, int pid, vector<Territory*> t, Hand* h, OrderList* olst, vector<Player*> noAttack, int isNeutral); //constructor  
         Player(const Player& p); //copy constructor
         ~Player(); //deconstructor 
         string getPlayerName();
@@ -44,6 +45,9 @@ class Player //this is the Player class
         int getReinforcementPool();
         void setReinforcementPool(int pool);
         void setpID(int pID);
+        int getNeutral();
+        void setGetCard(int getCard);
+        int getGetCard();
 
     private: // data members
         string playerName;
@@ -53,6 +57,8 @@ class Player //this is the Player class
         OrderList* olst;
         int reinforcementPool;
         vector<Player*> cannotAttack;
+        int isNeutral;
+        int getCard;
 
         friend class GameEngine;
 };

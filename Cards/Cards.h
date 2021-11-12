@@ -120,6 +120,9 @@ public:
 
     // Parameterized Constructor with a specific hand size
     Hand(const int h);
+
+    // Constructor with a list of cards
+    Hand(std::vector<Card*> cards);
     
     // Copy Constructor
     Hand(const Hand& hand);
