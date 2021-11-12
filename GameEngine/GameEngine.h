@@ -15,6 +15,7 @@
 #include "../Map/Map.h"
 #include "../Player/Player.h"
 #include "../Command/CommandProcessing.h"
+#include "../LoggingObserver/LoggingObserver.h"
 
 class Map;
 class Deck;
@@ -22,7 +23,7 @@ class Player;
 class CommandProcessor;
 
 // Declaring class of GameEngine
-class GameEngine {
+class GameEngine : public ILoggable, public Subject {
 
 private:
 
@@ -100,6 +101,8 @@ public:
     ~GameEngine();
 
     bool fileExist (const std::string& name);
+
+    std::string stringToLog();
 
 };
 

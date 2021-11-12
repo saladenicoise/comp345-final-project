@@ -312,6 +312,7 @@ void GameEngine::transition() {
 
         if(validTransition(command)) {
             doTransition(command);
+            notify(this);
         } else {
             commandProcessor->commands.back()->saveEffect("Not a valid transition. Cannot " + command + " at state " + *state);
             std::cout << commandProcessor->commands.back()->getEffect() << std::endl;
@@ -360,4 +361,8 @@ GameEngine::~GameEngine() {
 bool GameEngine::fileExist (const std::string& name) {
     ifstream f(name.c_str());
     return f.good();
+}
+
+std::string GameEngine::stringToLog() {
+    return "Current State is now: " + this->getState();
 }
