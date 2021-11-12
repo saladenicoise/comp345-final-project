@@ -387,7 +387,7 @@ bool Advance::validate() {
 }
 
 std::string Advance::stringToLog() {
-  return getAttackTarget()->countryName + " is now owned by " + getAttackTarget()->getOwningPlayer()->getPlayerName() + " and has an army count of " + to_string(getAttackTarget()->armyCount) + " \n" + attackSource->countryName + " now has an army count of " + to_string(attackSource->armyCount);
+  return getAttackTarget()->countryName + " is now owned by Player " + to_string(getAttackTarget()->getPlayerIDOccupying()) + " and has an army count of " + to_string(getAttackTarget()->armyCount) + " \n" + attackSource->countryName + " now has an army count of " + to_string(attackSource->armyCount);
 }
 void Advance::execute() {
     if(validate()) {
@@ -402,7 +402,7 @@ void Advance::execute() {
             }
         }
         if(attackOrder && sourcePlayer != targetPlayer) {
-            cout << "Now comencing attack" << endl;
+            cout << "Now commencing attack" << endl;
             //70% chance of an attacker dying
             int attackersKilled = round(static_cast<double>(attackTarget->armyCount * 0.7));
             //60% chance of a defender dying
@@ -607,7 +607,7 @@ bool Blockade::validate() {
     return false; //Not part of our territories
 }
 std::string Blockade::stringToLog() {
-    return target->getOwningPlayer()->getPlayerName() + " has lost ownership of "  + target->countryName + " to the neutral player, its army count has doubled to " + to_string(target->armyCount);
+    return "Player " + to_string(target->getPlayerIDOccupying()) + " has lost ownership of "  + target->countryName + " to the neutral player, its army count has doubled to " + to_string(target->armyCount);
 }
 
 void Blockade::execute() {

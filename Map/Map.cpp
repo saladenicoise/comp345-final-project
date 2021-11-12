@@ -12,9 +12,8 @@
 using namespace std;
 
 
-Player* Territory::getOwningPlayer() {
-    Player* temp;
-    return temp;
+int Territory::getPlayerIDOccupying() {
+    return this->ownerId;
 }
 
 Territory::Territory(string countryName, int continentNumber, int countryNumber){ //Territory constructor for default player/armycount

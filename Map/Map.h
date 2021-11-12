@@ -28,7 +28,7 @@ public:
     int armyCount; //army count of the territory
     int ownerId; //Corresponds to the id of the player owning this territory
     int getPlayerIDOccupying(); //Gets the ID of the player occupying this territory
-    Player* getOwningPlayer(); //Gets the player that owns the territory
+
     void setOwnerId(int id);
     //string getPlayerName();
 };
