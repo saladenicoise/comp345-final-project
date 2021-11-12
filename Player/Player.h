@@ -28,7 +28,8 @@ class Player //this is the Player class
         Player(const Player& p); //copy constructor
         ~Player(); //deconstructor 
         string getPlayerName();
-        int getPID(); 
+        int getPID();
+        void setpID(int pid);
         void toAttack(vector<Territory*> toAttackTerritory, Player& p);
         void toDefend(vector<Territory*> toDefendTerritory, Player& p);
         void issueOrder(const string& order);
@@ -43,7 +44,6 @@ class Player //this is the Player class
         void setTerritories(vector<Territory*> newTerritories);
         int getReinforcementPool();
         void setReinforcementPool(int pool);
-        void setpID(int pID);
 
     private: // data members
         string playerName;

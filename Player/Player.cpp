@@ -6,14 +6,14 @@
 using namespace std;
 Player::Player()
 {
-    this->h = new Hand();
+    //this->h = new Hand();
     this->olst = new OrderList();
 } //default constructor 
 
 Player::Player(string playerName)
 {
     this->playerName = playerName;
-    this->h = new Hand();
+    //this->h = new Hand();
     this->olst = new OrderList();
 }
 
@@ -93,6 +93,10 @@ int Player::getPID() //gets player's id
     return pid;
 }
 
+void Player::setpID(int pid){
+    this->pid = pid;
+}
+
 Hand *Player::getHand() //returns hand object
 {
     return h;
@@ -158,8 +162,4 @@ int Player::getReinforcementPool() { // gets the number of armies in popl
 
 void Player::setReinforcementPool(int pool) { // set pool size
     this->reinforcementPool = pool;
-}
-
-void Player::setpID(int pID) { //sets players id
-    this->pid = pID;
 }
