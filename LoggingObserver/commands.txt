@@ -1,0 +1,6 @@
+start
+loadmap bigeurope.map
+validatemap
+addplayer karim
+addplayer tom
+gamestart
