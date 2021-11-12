@@ -14,6 +14,7 @@ Command::Command(string command) {  // Parameterized constructor for Command cla
 
 void Command::saveEffect(string effect) {
     this->effect = effect;
+    notify(this);
 }
 
 string Command::getEffect() {
@@ -31,6 +32,9 @@ string Command::getCommand() {
 Command::~Command() {}
 
 
+std::string Command::stringToLog() {
+    return getEffect();
+}
 
 /* Defining methods for Command Processor Class. */
 
@@ -64,9 +68,14 @@ string CommandProcessor::readCommand() {
 
 }
 
+std::string CommandProcessor::stringToLog() {
+    return commands.back()->getCommand();
+}
+
 void CommandProcessor::saveCommand(string commandString) {
     Command* command = new Command(commandString);
     commands.push_back(command);
+    notify(this);
 }
 
 void CommandProcessor::getCommand() {

@@ -3,9 +3,10 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include "../LoggingObserver/LoggingObserver.h"
 using namespace std;
 
-class Command {
+class Command : public ILoggable, public Subject {
 
 private:
     string command;
@@ -19,9 +20,11 @@ public:
     string getCommand();
     void saveEffect(string effect);
     string getEffect();
+    std::string stringToLog();
+
 };
 
-class CommandProcessor {
+class CommandProcessor : public ILoggable, public Subject {
 
 private:
     virtual string readCommand();
@@ -34,6 +37,7 @@ public:
     void getCommand();
     bool checkIfValidCommand(string command);
     bool validate(string command, vector<string> nextValidCommands);
+    std::string stringToLog();
 
 };
 
