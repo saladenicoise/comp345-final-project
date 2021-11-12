@@ -56,6 +56,8 @@ int main() {
 
     }
 
+    cout << g->getCommandProcessor() << endl;
+
 
     delete g;
     g = nullptr;
