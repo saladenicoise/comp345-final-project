@@ -27,11 +27,10 @@ void Subject::detach(Observer *i) {
         if(observers[j] == i) {
             observers.erase(observers.begin() + j);
         }
-       this->attach()
     }
 }
 
-void Subject::notify(ILoggable *i) {
+void Subject::notify(ILoggable *i) { //Observer notify method for Order
     for(Observer* o : observers){
         o->update(i);
     }
