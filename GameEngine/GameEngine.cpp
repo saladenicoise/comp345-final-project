@@ -465,7 +465,6 @@ void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, De
         issueOrderPhase(players,players[targetPlayer],deck);
         executeOrderPhase(players);
         reinforcementPhase(map,players);
-        issueOrderPhase(players,players[targetPlayer],deck);
         executeOrderPhase(players);
         int i = 0;
         i++;
