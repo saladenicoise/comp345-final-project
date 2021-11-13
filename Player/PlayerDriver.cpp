@@ -37,10 +37,8 @@ int main() {
     }
 
     GameEngine g("console");
-    // g.reinforcementPhase(map->territories, players);
-    // g.issueOrderPhase(players,player2,deck);
-    // g.executeOrderPhase(players);
-     g.mainGameLoop(map->territories,players,deck);
+    g.mainGameLoop(map->territories,players,deck, map->territories.size());
+
 
 
     return 0;
