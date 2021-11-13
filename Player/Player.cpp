@@ -217,6 +217,7 @@ void Player::deployArmies(Player* p)
     int initialReinforcementPool = getReinforcementPool();
     do
     {
+        if(getReinforcementPool() == 0) continue;
         cout<<"How many armies do you want to deploy?: ";
         int numtoDeploy;
         cin>>numtoDeploy;
