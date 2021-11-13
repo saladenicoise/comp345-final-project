@@ -206,7 +206,7 @@ vector<Territory*> Player::toDefend(vector<Territory*> toDefendTerritory, Player
 
 void Player::issueOrderObject(const Order) //creates an order object and adds it to the list of orders. 
 {
-    Order *newOrder;
+    Order *newOrder = new Order();
     this->olst->addOrder(newOrder);
 }
 
@@ -249,7 +249,7 @@ void Player::selectOrder(Player *p, Player* targetPlayer, Deck* deck)
 
     if(h->getHandSize()!=0) //if the player has cards then one of the cards is selected and the card's play() method is called
     {
-        Deck* deck;
+        Deck* deck = new Deck();
         int cardIndex = rand() % (h->getHandSize()-1) + 0; //picks a random card
         p->getHand()->cardAtIndex(cardIndex).play(*p, *deck, *p->getHand());
 

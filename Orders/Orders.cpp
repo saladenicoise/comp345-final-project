@@ -49,6 +49,9 @@ Order &Order::operator=(const Order &order) {
     return *this;
 }
 
+bool Order::validate(){
+    return true;
+}
 
 //OrderList Class, nothing speciall is needed here and we dont have a default value
 OrderList::OrderList() {}

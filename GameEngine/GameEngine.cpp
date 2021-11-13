@@ -1,5 +1,5 @@
 #include "GameEngine.h"
-
+#include <unordered_map>
 // Defining the default constructor for GameEngine class
 GameEngine::GameEngine(string mode) {
     state = new std::string("pregame");
@@ -179,7 +179,6 @@ void GameEngine::startupPhase(std::string command) {
             nextValidCommands->push_back("addplayer");
         } else {
             noOfPlayers++; // Keep track of the number of players
-            playerName.clear();
             // Player creation
             Player* player = new Player(playername);
             player->setpID(noOfPlayers);
@@ -366,4 +365,114 @@ bool GameEngine::fileExist (const std::string& name) {
 
 std::string GameEngine::stringToLog() {
     return "Current State is now: " + this->getState();
+}
+
+void GameEngine::reinforcementPhase(vector<Territory*> map, vector<Player*> players) {
+    cout << "Starting the Reinforcement Phase" << endl;
+    vector <Territory*> Owned;
+    int temp = 0;
+    double count = 0;
+
+    for (int i = 0; i < players.size(); i++) {
+        temp = players[i]->getReinforcementPool();
+        Owned = players[i]->getTerritories();
+
+        // count the terriorties number
+        for (int j = 0; j < players[i]->getTerritories().size(); j++) {
+            count++;
+        }
+
+        // count number of territores per contintent in the world map
+        std::unordered_map<unsigned, size_t> countMap1;
+        for (auto v : map)
+            ++countMap1[v->continentNumber];
+
+        // count number of territores per contintent that are owned by the players
+        std::unordered_map<unsigned, size_t> countOwned;
+        for (auto v : Owned)
+            ++countOwned[v->continentNumber];
+
+        // check if they have the entire continent
+        // bonus is the number of territories in the contintent/3, more territories in continent = more bonus
+        for (auto const &k : countMap1) {
+            for (auto const &l : countOwned) {
+                if(k.first == l.first) {
+                    if(k.second == l.second) {
+                        temp += (int)floor(l.second/3);
+                        cout << "Player with pID: " << players[i]->getPID() << " has all the territories in contintent: " << l.first << endl;
+                        cout << "A bonus of "<< (int)floor(l.second/3) << " armies been awarded!\n" << endl;
+                    }
+                }
+            }
+        }
+        // reinforcements based on number of territories
+        temp += (int)floor(count/3);
+
+        // minimal number of reinforcements
+        temp += 3;
+        players[i]->setReinforcementPool(temp);
+
+        // reset variables
+        temp = 0;
+        count = 0;
+
+        cout << "Player with pID: " << players[i]->getPID() << " has " << players[i]->getReinforcementPool() << " armies" << endl;
+    }
+}
+
+void GameEngine::issueOrderPhase(Player *p,Player* targetPlayer, Deck* deck)
+{
+    p->issuingOrder(p,targetPlayer, deck);
+
+}
+void GameEngine::executeOrderPhase(Player *p)
+{
+    cout<<"Execute Order Phase begins..."<<endl;
+    Order *currentOrder;
+    Order *narrative;
+    OrderList narrativeOrder;
+
+    std::cout << "Player 0's order list: \n" << *p->getOrderList() <<std::endl;
+    for (int i=0; i<p->getOrderList()->getOrderList().size(); i++)
+    {
+        std::string str (p->getOrderList()->getOrderList()[i]->getOrderType() + " ");
+        currentOrder = p->getOrderList()->getOrderList()[i];
+        currentOrder->execute();
+        string isValid = currentOrder->validate() ? "true" : "false";
+        narrative = new Order(str.append(isValid));
+        narrativeOrder.addOrder(narrative);
+    }
+
+    cout<<"Narrative:\n"<<narrativeOrder<<endl;
+}
+
+void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck) {
+    srand(time(NULL));
+
+    while (true) {
+        int i = 0;
+        int noOfPlayers = players.size();
+
+        // for (int i=0; i<players.size(); i++)
+        do {
+            int targetPlayer = rand() % players.size() - 1 + 0;
+            reinforcementPhase(map, players);
+            issueOrderPhase(players[i], players[targetPlayer], deck);
+            executeOrderPhase(players[i]);
+            if (players[i]->defendList.size() ==
+                0) //if a player does not control any territories then the player is removed
+            {
+                delete players[i];
+                noOfPlayers = noOfPlayers - 1;
+            }
+
+            if (players[i]) //if player controls all the territories then game ends and winner is announced
+            {
+                cout << "Game Over" << endl;
+                cout << "Player " << players[i]->getPID() << " won" << endl;
+                break;
+            }
+            i++;
+        } while (i < noOfPlayers);
+    }
 }

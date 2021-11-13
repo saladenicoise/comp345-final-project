@@ -33,7 +33,7 @@ class Order : public ILoggable, public Subject {
         virtual void execute();
 
         virtual std::string stringToLog();
-
+        virtual bool validate();
 
 
 };
