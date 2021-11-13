@@ -2,7 +2,7 @@
 
 Command::Command() {} // Default constructor for Command class.
 
-Command::Command(Command &comObj) { // Copy constructor for Command class.
+Command::Command(const Command &comObj) { // Copy constructor for Command class.
     command = comObj.command;
     effect = comObj.effect;
 }
@@ -42,7 +42,7 @@ CommandProcessor::CommandProcessor() {
 
 }
 
-CommandProcessor::CommandProcessor(CommandProcessor &comProcObj) {
+CommandProcessor::CommandProcessor(const CommandProcessor &comProcObj) {
     for(int i = 0; i < comProcObj.commands.size(); i++) {
         Command command = *comProcObj.commands.at(i);
         commands.push_back(new Command(command));
