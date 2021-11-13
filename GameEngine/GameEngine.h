@@ -105,9 +105,10 @@ public:
     std::string stringToLog();
 
     void reinforcementPhase(vector<Territory*> map, vector<Player*> players);
-    void issueOrderPhase(Player *p, Player* targetPlayer, Deck* deck);
-    void executeOrderPhase(Player *p);
-    void mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck);
+    void reinforcementPhase(vector<Territory*> map, vector<Player*> players);
+    void issueOrderPhase(vector<Player*> player, Player* targetPlayer, Deck* deck);
+    void executeOrderPhase(vector<Player*> player);
+    void mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck,int mapSize);
 
 };
 
