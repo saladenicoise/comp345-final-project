@@ -12,6 +12,13 @@ Command::Command(string command) {  // Parameterized constructor for Command cla
     this->effect = "No Effect Yet!";
 }
 
+Command &Command::operator=(const Command &comObj) {
+    this->command = comObj.command;
+    this->effect = comObj.effect;
+
+    return *this;
+}
+
 void Command::saveEffect(string effect) {
     this->effect = effect;
     notify(this);
@@ -28,6 +35,15 @@ void Command::setCommand(string command) {
 string Command::getCommand() {
     return command;
 }
+
+// stream insertion operator overloading function.
+std::ostream& operator<< (std::ostream& out, const Command& comObj) {
+    out << "Command: " << comObj.command << endl;
+    out << "Effect: " << comObj.effect << endl;
+
+    return out;
+}
+
 
 Command::~Command() {}
 
@@ -49,6 +65,24 @@ CommandProcessor::CommandProcessor(CommandProcessor &comProcObj) {
     }
 }
 
+// Assignment operator overload function.
+CommandProcessor &CommandProcessor::operator=(const CommandProcessor &comProcObj) {
+    for(int i = 0; i < comProcObj.commands.size(); i++) {
+        Command command = *comProcObj.commands.at(i);
+        commands.push_back(new Command(command));
+    }
+
+    return *this;
+}
+
+// Insertion operator overload function.
+std::ostream& operator<<(std::ostream& out, const CommandProcessor& comObj) {
+    for(int i = 0; i < comObj.commands.size(); i++) {
+        out << comObj.commands.at(i)->getEffect() << endl;
+    }
+    return out;
+}
+
 CommandProcessor::~CommandProcessor() {
     for(int i = 0; i < commands.size(); i++) {
         delete commands.at(i);
@@ -56,6 +90,14 @@ CommandProcessor::~CommandProcessor() {
     }
 }
 
+// getCommand function for reading and saving the command.
+void CommandProcessor::getCommand() {
+    string commandString = this->readCommand();
+
+    saveCommand(commandString);
+}
+
+// readCommand function for getting command from the user.
 string CommandProcessor::readCommand() {
     string commandString;
     Command command;
@@ -76,13 +118,6 @@ void CommandProcessor::saveCommand(string commandString) {
     Command* command = new Command(commandString);
     commands.push_back(command);
     notify(this);
-}
-
-void CommandProcessor::getCommand() {
-    string commandString = readCommand();
-
-    saveCommand(commandString);
-
 }
 
 bool CommandProcessor::checkIfValidCommand(string command) {
@@ -113,6 +148,15 @@ FileLineReader::FileLineReader(const FileLineReader& flr) {
     myFile.open(filename);
 }
 
+// Assignment operator overload function
+FileLineReader &FileLineReader::operator=(const FileLineReader &flr) {
+    filename = flr.filename;
+    if(!myFile.is_open())
+        myFile.open(filename);
+
+    return *this;
+}
+
 FileLineReader::~FileLineReader(){}
 
 string FileLineReader::readLineFromFile () {
@@ -132,8 +176,32 @@ string FileLineReader::readLineFromFile () {
     return command;
 }
 
+// Insertion operator overload function
+std::ostream& operator<<(std::ostream& out, const FileLineReader& flr) {
+    out << "File being processed: " << flr.filename << endl;
+    return out;
+}
+
 FileCommandProcessorAdapter::FileCommandProcessorAdapter(FileLineReader flr) {
     this->flr = new FileLineReader(flr);
+}
+
+// Copy constructor for FileCommandProcessorAdapter class.
+FileCommandProcessorAdapter::FileCommandProcessorAdapter(const FileCommandProcessorAdapter &fcpa) {
+    this->flr = new FileLineReader(*fcpa.flr);
+}
+
+// Assignment operator overload function.
+FileCommandProcessorAdapter &FileCommandProcessorAdapter::operator=(const FileCommandProcessorAdapter &fcpa) {
+    this->flr = new FileLineReader(*fcpa.flr);
+    return *this;
+}
+
+// Insertion operator overload function.
+std::ostream& operator<<(std::ostream& out, const FileCommandProcessorAdapter& fcpa) {
+    out << "FileCommandProcessorAdapter for reading commands from files" << endl;
+
+    return out;
 }
 
 FileCommandProcessorAdapter::~FileCommandProcessorAdapter() {
