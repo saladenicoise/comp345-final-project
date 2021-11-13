@@ -1,4 +1,4 @@
-#include "GameEngine.h"
+#include "../GameEngine/GameEngine.h"
 
 int main() {
 
@@ -55,6 +55,8 @@ int main() {
 
 
     }
+
+
 
 
     delete g;

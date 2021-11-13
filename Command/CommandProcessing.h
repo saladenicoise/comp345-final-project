@@ -59,7 +59,7 @@ private:
 public:
     FileCommandProcessorAdapter(FileLineReader flr);
     ~FileCommandProcessorAdapter();
-    
+
 
 
 };

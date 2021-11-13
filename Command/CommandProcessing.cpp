@@ -146,4 +146,3 @@ string FileCommandProcessorAdapter::readCommand() {
 
     return command;
 }
-

@@ -257,9 +257,9 @@ void GameEngine::startupPhase(std::string command) {
         oldState = *state;
         setState("Assign Reinforcement");
         transitionString = displayTransition(oldState, state, command);
+        commandProcessor->commands.back()->saveEffect(transitionString);
         std::cout << "\nNow Entering the Play Phase!\n" << std::endl;
         nextValidCommands->clear();
-        nextValidCommands->push_back("assignreinforcement");
     }
     
 }

@@ -9,6 +9,7 @@
 #include "../Command/CommandProcessing.h"
 #include "../Player/Player.h"
 #include "../GameEngine/GameEngine.h"
+
 int main() {
     LogObserver* logObserver = new LogObserver;
     OrderList* orderList = new OrderList;
@@ -19,7 +20,7 @@ int main() {
     pTerritorys.push_back(t);
     p->setTerritories(pTerritorys);
     t->armyCount = 10;
-    Blockade* blockade = new Blockade(p, t);
+    Blockade* blockade = new Blockade(p, t, p);
     CommandProcessor* commandProcessor = new CommandProcessor;
     FileLineReader* flr = new FileLineReader("commands.txt");
     FileCommandProcessorAdapter* fileCommandProcessorAdapter = new FileCommandProcessorAdapter(*flr);

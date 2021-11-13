@@ -5,6 +5,8 @@ using namespace std;
 #include <cmath> //Necessary to round 
 
 class Player;
+class Map;
+class Territory;
 
 
 //Order Class
@@ -235,7 +237,7 @@ int Deploy::getToDeploy() {
 
 bool Deploy::validate() {
     //Iterate through all terittories owned by the player
-    if (targetTerritory == NULL) {
+    if (targetTerritory == nullptr) {
         return false;
     }
     for(int i = 0; i < sourcePlayer->getTerritories().size(); i++) {
@@ -244,10 +246,9 @@ bool Deploy::validate() {
         //Is the number to deploy <= to the reinforcement pool?
         if((sourcePlayer->getTerritories()[i] == targetTerritory) && (numtoDeploy > 0) && (numtoDeploy <= sourcePlayer->getReinforcementPool())) {
             return true;
-        }else{
-            return false;
         }
     }
+    return false;
 }
 
 std::string Deploy::stringToLog() {
@@ -341,12 +342,16 @@ int Advance::getNumOfUnits() {
 
 //Always return true, since we havent implemented the order functionality yet
 bool Advance::validate() {
-    if((attackSource || attackTarget) == NULL) {
+    if(attackSource == nullptr || attackTarget == nullptr) {
         return false;
     }
-    for(int i = 0; i < sourcePlayer->getNotAttackablePlayers().size(); i++) {
-        if(sourcePlayer->getNotAttackablePlayers()[i] == targetPlayer) { //They have an alliance and cannot attack each other
-            return false;
+    bool attackable = true;
+    if(sourcePlayer->getNotAttackablePlayers().size() > 0) {
+        for (int i = 0; i < sourcePlayer->getNotAttackablePlayers().size(); i++) {
+            if (sourcePlayer->getNotAttackablePlayers()[i] == targetPlayer) {
+                attackable = false;
+                break;
+            }
         }
     }
     Territory* sourceTerritory;
@@ -379,7 +384,7 @@ bool Advance::validate() {
         }
     }
     //Are the source and destination not null AND is the number of units less than or = to armies in territory AND are the territories adjacent
-    if(((sourceTerritory && destTerritory) != NULL) && (numOfUnits <= sourceTerritory->armyCount) && adjacent) {
+    if((sourceTerritory != nullptr || destTerritory != nullptr) && (numOfUnits <= sourceTerritory->armyCount) && adjacent && attackable) {
         return true;
     }else{
         return false;
@@ -413,35 +418,37 @@ void Advance::execute() {
             if(survivedAttackers > 0 && survivedDefenders == 0) {
                 cout << "Attack Status: WON | Territory Conquered!" << endl;
                 cout << "---------" << endl;
-                cout << "Defending Casualties: " + defendersKilled << endl;
-                cout << "Attacking Casualties: " + attackersKilled << endl;
+                cout << "Defending Casualties: " << defendersKilled << endl;
+                cout << "Attacking Casualties: " << attackersKilled << endl;
                 cout << "---------" << endl;
 
                 //Move Units
-                attackSource->armyCount -= survivedAttackers;
-                attackTarget->armyCount = survivedAttackers;
+                attackSource->armyCount = attackSource->armyCount - numOfUnits;
+                attackTarget->armyCount = numOfUnits - attackersKilled;
 
                 //Change Ownership
                 attackTarget->setOwnerId(sourcePlayer->getPID());
 
                 //Remove from loser's list
                 vector<Territory *> loserTer = targetPlayer->getTerritories();
-                for(int i = 0; loserTer.size(); i++) {
-                    if (loserTer[i] == attackTarget) {
-                        loserTer.erase(loserTer.begin()+i);//Iterator that starts at the beginning and goes to the proper index
-                        break;
+                vector<Territory *> newTer;
+                for(int i = 0; i < loserTer.size(); i++) {
+                    if(loserTer[i] != attackTarget) {
+                        newTer.push_back(loserTer[i]);
                     }
                 }
+                targetPlayer->setTerritories(newTer);
 
                 //Add to winner's list
                 vector<Territory *> winnerTer = sourcePlayer->getTerritories();
                 winnerTer.push_back(attackTarget);
                 sourcePlayer->setTerritories(winnerTer);
+                sourcePlayer->setGetCard(1);
             }else{ //Attacker lost
                 cout << "Attack Status: LOST | Territory Defended!" << endl;
                 cout << "---------" << endl;
-                cout << "Defending Casualties: " + defendersKilled << endl;
-                cout << "Attacking Casualties: " + attackersKilled << endl;
+                cout << "Defending Casualties: " << defendersKilled << endl;
+                cout << "Attacking Casualties: " << attackersKilled << endl;
                 cout << "---------" << endl;
 
                 //Update army counts
@@ -515,22 +522,22 @@ Territory* Bomb::getTarget() {
 }
 
 bool Bomb::validate() {
-    if (target == NULL) {
+    Territory* targAddress = 0;
+    for(int i = 0; i < sourcePlayer->getTerritories().size(); i++){
+        targAddress = 0;
+        if((sourcePlayer->getTerritories()[i] == target) && (target != nullptr)){
+            targAddress = sourcePlayer->getTerritories()[i];
+            break;
+        }
+    }
+
+    //check that the player issuing the order is not targeting their own territory
+    if (targAddress != target) {
+        return true;
+    }
+    else {
         return false;
     }
-    for(int i = 0; i < sourcePlayer->getTerritories().size(); i++) {
-        if(sourcePlayer->getTerritories()[i] == target) { //Cannot bomb your own territory
-            return false;
-        }
-    }
-    for(int i = 0; i < sourcePlayer->getTerritories().size(); i++) { //Loop through every owned territory
-        for(int j = 0; j < sourcePlayer->getTerritories()[i]->edges.size(); i++) { //Loop through connected territories of each territory to see if our target is adjacent
-            if(sourcePlayer->getTerritories()[i]->edges[j] == target) {
-                return true;
-            }
-        }
-    }
-    return false; //If target not in adjacency list of every territory, then return false
 }
 
 
@@ -567,10 +574,11 @@ Blockade::Blockade() {
     this->target = nullptr;
 }
 
-Blockade::Blockade(Player *sourcePlayer, Territory *target) {
+Blockade::Blockade(Player *sourcePlayer, Territory *target, Player* neutralPlayer) {
     this->orderType = "blockade";
     this->sourcePlayer = sourcePlayer;
     this->target = target;
+    this->neutralPlayer = neutralPlayer;
 }
 
 //Copy constructor
@@ -597,7 +605,6 @@ Territory* Blockade::getTarget() {
     return target;
 }
 
-//Always return true, since we havent implemented the order functionality yet
 bool Blockade::validate() {
     for(int i = 0; i < sourcePlayer->getTerritories().size(); i++) {
         if(sourcePlayer->getTerritories()[i] == target) {//Is it part of our territories?
@@ -627,6 +634,9 @@ void Blockade::execute() {
             }
         }
         sourcePlayer->setTerritories(sourceOwnedTer);
+        vector<Territory*> neutralOwnerTer = neutralPlayer->getTerritories();
+        neutralOwnerTer.push_back(target); //Add to neutral player
+        neutralPlayer->setTerritories(neutralOwnerTer);
         notify(this);
     }else{
         cout << "Invalid Blockade Order" << endl;
@@ -700,7 +710,7 @@ int Airlift::getNumOfArmies() {
 
 //Always return true, since we havent implemented the order functionality yet
 bool Airlift::validate() {
-    if((source || dest) == NULL) {
+    if(!(source || dest)) {
         return false;
     }
     bool hasSource = false, hasDest = false;
@@ -812,7 +822,7 @@ void Negotiate::execute() {
             noAttackP2.push_back(player);
         }
         noAttackP2.push_back(sourcePlayer);
-        targetPlayer->setNotAttackablePlayers(noAttackP);
+        targetPlayer->setNotAttackablePlayers(noAttackP2);
     }else{
         cout << "Invalid Negotiate Order" << endl;
     }
