@@ -218,7 +218,7 @@ Deploy::Deploy(const Deploy &deploy) {
 }
 //Destructor
 Deploy::~Deploy() {
-    
+
 }
 
 //Getter
@@ -315,7 +315,7 @@ Advance::Advance(const Advance &advance) {
 
 //Destructor
 Advance::~Advance() {
-    
+
 }
 
 //Getter
@@ -395,7 +395,7 @@ bool Advance::validate() {
 }
 
 std::string Advance::stringToLog() {
-  return getAttackTarget()->countryName + " is now owned by Player " + to_string(getAttackTarget()->getPlayerIDOccupying()) + " and has an army count of " + to_string(getAttackTarget()->armyCount) + " \n" + attackSource->countryName + " now has an army count of " + to_string(attackSource->armyCount);
+    return getAttackTarget()->countryName + " is now owned by Player " + to_string(getAttackTarget()->getPlayerIDOccupying()) + " and has an army count of " + to_string(getAttackTarget()->armyCount) + " \n" + attackSource->countryName + " now has an army count of " + to_string(attackSource->armyCount);
 }
 void Advance::execute() {
     if(validate()) {
@@ -508,7 +508,7 @@ Bomb::Bomb(const Bomb &bomb) {
 
 //Destructor
 Bomb::~Bomb() {
-    
+
 }
 
 //Getter
@@ -592,7 +592,7 @@ Blockade::Blockade(const Blockade &blockade) {
 }
 
 Blockade::~Blockade() {
-    
+
 }
 
 //Getter
@@ -624,7 +624,7 @@ void Blockade::execute() {
     if (validate()) {
         cout << "Blockade Order Executed" << endl;
         target->armyCount *= 2;
-        
+
         //Change ownership to neutral player
         target->setOwnerId(0);
 
@@ -687,7 +687,7 @@ Airlift::Airlift(const Airlift &airlift) {
 }
 
 Airlift::~Airlift() {
-    
+
 }
 
 //Getter
@@ -848,5 +848,12 @@ Negotiate &Negotiate::operator=(const Negotiate &negotiate) {
     return *this;
 }
 
+Order* OrderList::getIndex(int index)
+{
+    return orderList[index];
+}
 
-
+int OrderList::getSize()
+{
+    return orderList.size();
+}

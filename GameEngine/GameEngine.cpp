@@ -179,7 +179,6 @@ void GameEngine::startupPhase(std::string command) {
             nextValidCommands->push_back("addplayer");
         } else {
             noOfPlayers++; // Keep track of the number of players
-            playerName.clear();
             // Player creation
             Player* player = new Player(playername);
             player->setpID(noOfPlayers);
@@ -434,10 +433,10 @@ void GameEngine::executeOrderPhase(Player *p)
     OrderList narrativeOrder;
 
     std::cout << "Player 0's order list: \n" << *p->getOrderList() <<std::endl;
-    for (int i=0; i<p->getOrderList()->getOrderList().size(); i++)
+    for (int i=0; i<p->getOrderList()->getSize(); i++)
     {
-        std::string str (p->getOrderList()->getOrderList()[i]->getOrderType() + " ");
-        currentOrder = p->getOrderList()->getOrderList()[i];
+        std::string str (p->getOrderList()->getIndex(i)->getOrderType() + " ");
+        currentOrder = p->getOrderList()->getIndex(i);
         currentOrder->execute();
         string isValid = currentOrder->validate() ? "true" : "false";
         narrative = new Order(str.append(isValid));
