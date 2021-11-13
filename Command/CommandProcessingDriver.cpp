@@ -1,4 +1,4 @@
-#include "GameEngine.h"
+#include "../GameEngine/GameEngine.h"
 
 int main() {
 
@@ -44,12 +44,20 @@ int main() {
         g = new GameEngine(filename);
     }
 
+
     while(g->getState() != "Assign Reinforcement") {
 
         if(g->getState() != "pregame")
             g->displayValidCommands();
+
         g->transition();
+
+
+
     }
+
+
+
 
     delete g;
     g = nullptr;

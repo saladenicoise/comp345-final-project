@@ -1,6 +1,8 @@
 #include "Orders.h"
 #include "../Map/Map.h"
 #include "../Cards/Cards.h"
+#include "../Player/Player.h"
+#include "../LoggingObserver/LoggingObserver.h"
 #include "../GameEngine/GameEngine.h"
 #include <iostream>
 #include <vector>
@@ -168,14 +170,6 @@ int main() {
         }
     }
 
-    delete map;
-    delete deployOrder;
-    delete deployOrder2;
-    delete advanceOrder;
-    delete advanceOrder2;
-    delete bombOrder;
-    delete blockadeOrder;
-    delete airliftOrder;
-    delete negotiateOrder; 
+
     return 0;
 }

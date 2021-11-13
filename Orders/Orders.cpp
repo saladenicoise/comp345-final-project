@@ -5,6 +5,8 @@ using namespace std;
 #include <cmath> //Necessary to round 
 
 class Player;
+class Map;
+class Territory;
 
 
 //Order Class

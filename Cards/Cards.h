@@ -121,9 +121,7 @@ public:
     // Parameterized Constructor with a specific hand size
     Hand(const int h);
 
-    // Constructor with a list of cards
-    Hand(std::vector<Card*> cards);
-    
+    Hand(vector<Card*>);
     // Copy Constructor
     Hand(const Hand& hand);
 
@@ -152,7 +150,7 @@ private:
     // Data members
     // A collection of cards in a vector
     std::vector<Card*> hand;
-    int* size;
+    int size;
 };
 
 // end marker for the above's #ifndef

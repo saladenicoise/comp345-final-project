@@ -261,8 +261,10 @@ Hand::Hand()
     this->size = 0;
 }
 
-Hand::Hand(std::vector<Card*> cards) {
-    this->hand = cards;
+Hand::Hand(std::vector<Card*> input){
+    this->hand = input;
+
+    this->size = input.size();
 }
 
 // Copy Constructor

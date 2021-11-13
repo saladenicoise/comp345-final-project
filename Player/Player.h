@@ -17,7 +17,7 @@ class Territory;
 class Hand;
 class OrderList;
 class Order;
-
+class Deck;
 class Player //this is the Player class
 {
     
@@ -30,15 +30,13 @@ class Player //this is the Player class
         ~Player(); //deconstructor 
         string getPlayerName();
         int getPID(); 
-        void toAttack(vector<Territory*> toAttackTerritory, Player& p);
-        void toDefend(vector<Territory*> toDefendTerritory, Player& p);
         void issueOrder(const string& order);
         void printOrder();
         Player& operator=(const Player& p); //overloaded assignment operator
         friend std::ostream& operator<<(std::ostream &os,const Player& p); //stream insertion operator
         Hand* getHand();
         OrderList* getOrderList();
-        vector<Territory*> getTerritories();
+
         vector<Player*> getNotAttackablePlayers();
         void setNotAttackablePlayers(vector<Player*> newUnattackablePlayer);
         void setTerritories(vector<Territory*> newTerritories);
@@ -48,6 +46,16 @@ class Player //this is the Player class
         int getNeutral();
         void setGetCard(int getCard);
         int getGetCard();
+        vector<Territory*> getNeighbour(vector<Territory*>);
+        void issuingOrder(Player *p, Player* targetPlayer, Deck* deck);
+        void issueOrderObject(const Order); //creates an order object and adds it to the list of orders. 
+        int getOrderSize(int size); //returns order list object
+        void deployArmies(Player *p);
+        void selectOrder(Player *p, Player* playerTarget, Deck* deck);
+        vector<Territory*> getTerritories();
+        vector<Territory*> toDefend(vector<Territory*>, Player& p);
+       vector<Territory*> toAttack(vector<Territory*>, Player& p);
+
 
     private: // data members
         string playerName;
@@ -59,6 +67,9 @@ class Player //this is the Player class
         vector<Player*> cannotAttack;
         int isNeutral;
         int getCard;
+        vector<Territory*> attackList;
+        vector<Territory*> defendList;
+        int tempReinforcementPool;
 
         friend class GameEngine;
 };
