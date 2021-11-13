@@ -2,7 +2,8 @@
 #include "../Map/Map.h"
 using namespace std;
 #include <iostream>
-#include <cmath> //Necessary to round 
+#include <cmath> //Necessary to round
+#include <algorithm>
 
 class Player;
 class Map;
