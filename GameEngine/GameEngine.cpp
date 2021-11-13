@@ -421,59 +421,65 @@ void GameEngine::reinforcementPhase(vector<Territory*> map, vector<Player*> play
     }
 }
 
-void GameEngine::issueOrderPhase(Player *p,Player* targetPlayer, Deck* deck)
+void GameEngine::issueOrderPhase(vector<Player*> player,Player* targetPlayer, Deck* deck)
 {
-    p->issuingOrder(p,targetPlayer, deck);
+    for (int i=0; i<player.size(); i++)
+    {
+        player[i]->issuingOrder(player[i],targetPlayer, deck);
+    }
 
 }
-void GameEngine::executeOrderPhase(Player *p)
-{
-    cout<<"Execute Order Phase begins..."<<endl;
+void GameEngine::executeOrderPhase(vector<Player*> player)
+{    
+    cout<<"\nStarting Execute Order Phase..."<<endl;
     Order *currentOrder;
     Order *narrative;
     OrderList narrativeOrder;
-
-    std::cout << "Player 0's order list: \n" << *p->getOrderList() <<std::endl;
-    for (int i=0; i<p->getOrderList()->getSize(); i++)
+    for (int i=0; i<player.size(); i++)
     {
-        std::string str (p->getOrderList()->getIndex(i)->getOrderType() + " ");
-        currentOrder = p->getOrderList()->getIndex(i);
-        currentOrder->execute();
-        string isValid = currentOrder->validate() ? "true" : "false";
-        narrative = new Order(str.append(isValid));
-        narrativeOrder.addOrder(narrative);
+        //std::cout << "Player "<<player[i]->getPID() <<"'s order list: \n" << *player[i]->getOrderList() <<std::endl;
+        for (int j=0; j<player[i]->getOrderList()->getSize(); i++)
+        {    
+            std::string str (player[i]->getOrderList()->getIndex(j)->getOrderType() + " ");
+            currentOrder = player[i]->getOrderList()->getIndex(j);
+            currentOrder->execute();
+            string isValid = currentOrder->validate() ? "true" : "false";
+            narrative = new Order(str.append(isValid));
+            narrativeOrder.addOrder(narrative);
+        }
     }
-
+    
     cout<<"Narrative:\n"<<narrativeOrder<<endl;
 }
 
-void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck) {
-    srand(time(NULL));
 
-    while (true) {
+
+
+void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck,int mapSize)
+{
+    srand (time(NULL));
+    while (true)
+    {
+        int targetPlayer = rand() % players.size()-1 + 0;
+        reinforcementPhase(map,players);
+        issueOrderPhase(players,players[targetPlayer],deck);
+        executeOrderPhase(players);
+        reinforcementPhase(map,players);
+        issueOrderPhase(players,players[targetPlayer],deck);
+        executeOrderPhase(players);
         int i = 0;
-        int noOfPlayers = players.size();
-
-        // for (int i=0; i<players.size(); i++)
-        do {
-            int targetPlayer = rand() % players.size() - 1 + 0;
-            reinforcementPhase(map, players);
-            issueOrderPhase(players[i], players[targetPlayer], deck);
-            executeOrderPhase(players[i]);
-            if (players[i]->defendList.size() ==
-                0) //if a player does not control any territories then the player is removed
-            {
-                delete players[i];
-                noOfPlayers = noOfPlayers - 1;
-            }
-
-            if (players[i]) //if player controls all the territories then game ends and winner is announced
-            {
-                cout << "Game Over" << endl;
-                cout << "Player " << players[i]->getPID() << " won" << endl;
-                break;
-            }
-            i++;
-        } while (i < noOfPlayers);
+        i++;
+        if (players[i]->defendList.size()==0) //if a player does not control any territories then the player is removed
+        {
+            delete players[i];
+            cout<<"size of players: "<<players.size()<<endl;
+        }
+        if (players[i]->getTerritories().size() == mapSize)//if player controls all the territories then game ends and winner is announced
+        {
+            cout<<"Game Over"<<endl;
+            cout<<"Player " << players[i]->getPID() << " won" << endl;
+            break;
+        }
+        
     }
 }
