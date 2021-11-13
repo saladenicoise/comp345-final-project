@@ -243,12 +243,14 @@ bool Deploy::validate() {
     if (targetTerritory == nullptr) {
         return false;
     }
-    for(int i = 0; i < sourcePlayer->getTerritories().size(); i++) {
         //Does the current territory match that of the target territory?
         //Is the number to deploy > 0?
         //Is the number to deploy <= to the reinforcement pool?
-        if((sourcePlayer->getTerritories()[i] == targetTerritory) && (numtoDeploy > 0) && (numtoDeploy <= sourcePlayer->getReinforcementPool())) {
-            return true;
+     if (std::find(sourcePlayer->getTerritories().begin(), sourcePlayer->getTerritories().end(), targetTerritory) != sourcePlayer->getTerritories().end())
+    {
+        if ((numtoDeploy > 0) && (numtoDeploy <= sourcePlayer->getReinforcementPool()))
+        {
+        return true;
         }
     }
     return false;
