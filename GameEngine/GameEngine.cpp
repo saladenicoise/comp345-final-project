@@ -179,6 +179,7 @@ void GameEngine::startupPhase(std::string command) {
             nextValidCommands->push_back("addplayer");
         } else {
             noOfPlayers++; // Keep track of the number of players
+            playerName.clear();
             // Player creation
             Player* player = new Player(playername);
             player->setpID(noOfPlayers);
