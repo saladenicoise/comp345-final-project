@@ -33,7 +33,7 @@ public:
     vector<Command*> commands; // vector of commands
     CommandProcessor(); // default constructor
     CommandProcessor(CommandProcessor& comProcObj); // copy constructor
-    ~CommandProcessor(); // destructor
+    virtual ~CommandProcessor(); // destructor
     void getCommand(); // accessor for commandprocessor
     bool checkIfValidCommand(string command); // check if valid command
     bool validate(string command, vector<string> nextValidCommands); // validate method for next viable command
