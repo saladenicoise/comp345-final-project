@@ -464,8 +464,6 @@ void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, De
         reinforcementPhase(map,players);
         issueOrderPhase(players,players[targetPlayer],deck);
         executeOrderPhase(players);
-        reinforcementPhase(map,players);
-        executeOrderPhase(players);
         int i = 0;
         i++;
         if (players[i]->defendList.size()==0) //if a player does not control any territories then the player is removed
