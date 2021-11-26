@@ -454,7 +454,6 @@ void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, De
     {
         cout<<"-----------------------------------------------------"<<endl;
         cout<<"Turn "<<count<<endl;
-        int targetPlayer = rand() % players.size()-1 + 0;
         reinforcementPhase(map,players);
         issueOrderPhase(players,players,deck);
         executeOrderPhase(players);
