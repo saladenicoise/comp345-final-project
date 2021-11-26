@@ -245,57 +245,144 @@ void Player::deployArmies(Player* p)
         p->setReinforcementPool(initialReinforcementPool);//sets it back to original reinforcementPool when we call execution in GameEngine
     }
 }
-void Player::selectOrder(Player *p, Player* targetPlayer, Deck* deck)
-{
 
+void Player::selectOrder(Player* p, vector<Player*> targetPlayer, Deck* deck)
+{
+    srand (time(NULL));
     if(h->getHandSize()!=0) //if the player has cards then one of the cards is selected and the card's play() method is called
     {
-        Deck* deck = new Deck();
-        int cardIndex = rand() % (h->getHandSize()-1) + 0; //picks a random card
-        p->getHand()->cardAtIndex(cardIndex).play(*p, *deck, *p->getHand());
-
-        if (*p->getHand()->cardAtIndex(cardIndex).getCardType()==cardType::AIRLIFT)
+        cout<<"Do you want to issue an order from your cards? y/n: ";
+        string answer;
+        cin>>answer;
+        if (answer=="y")
         {
-            int source = rand() % defendList.size()-1 + 0;
-            int target = rand() % defendList.size()-1 + 0;
-            int army = rand() % defendList[source]->armyCount + 1;
-            Airlift *airlift = new Airlift(p,defendList[source],defendList[target],army);
-            p->issueOrderObject(*airlift);
+            cout<<"\n"<<*p->getHand();
+            cout<<"Which card would you like to select?: ";
+            string card;
+            cin>>card;
+            if (card=="airlift")
+            {
+                int index = p->getHand()->findCard(AIRLIFT);
+                p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand());
+                for (int i=0; i<defendList.size(); i++)
+                {
+                    cout<<i<<": "<<*defendList[i]<<endl;
+                }
+                cout<<"Which territory do you want to airlift?: ";
+                int source,target,army;
+                cin>>source;
+                cout<<"Which territory do you want to target?: ";
+                cin>>target;
+                cout<<"How many armies do you want to airlift (choose between 1-" << defendList[source]->armyCount << ")?: ";
+                cin>>army;
+                Airlift *airlift = new Airlift(p,defendList[source],defendList[target],army);
+                p->issueOrderObject(*airlift);
+            }
+        	if (card=="bomb")
+        	{
+        	    vector<Territory*> bombTerritories;
+                int index = p->getHand()->findCard(BOMB);
+                p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand());
+                for (int i=0; i<targetPlayer.size(); i++)
+                {
+                    if (p!=targetPlayer[i])
+                    {
+                        for (int t=0; t<attackList.size(); t++)
+                        {
+                            if (std::find(targetPlayer[i]->getTerritories().begin(), targetPlayer[i]->getTerritories().end(), attackList[t]) != targetPlayer[i]->getTerritories().end()) 
+                            {
+                                cout<<t<<": " <<*targetPlayer[i]->getTerritories()[t]<<endl;
+                                bombTerritories.push_back(targetPlayer[i]->getTerritories()[t]);
+                            }
+                        }
+                    }
+                }
+                int numTerritory;
+                cin>>numTerritory;
+                Bomb *bomb = new Bomb(p,bombTerritories[numTerritory]);
+                p->issueOrderObject(*bomb);
+        	}
+            if (card=="blockade")
+        	{
+        	    int index = p->getHand()->findCard(BLOCKADE);
+                p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand());
+                for (int i=0; i<defendList.size(); i++)
+                {
+                    cout<<i<<": "<<*defendList[i]<<endl;
+                }
+                cout<<"Which territory do you want to blockade?: ";
+                int numTerritory;
+                cin>>numTerritory;
+                Player* neutralPlayer;
+                for (int i=0; i<targetPlayer.size(); i++)
+                {
+                    if (targetPlayer[i]->getNeutral()==1)
+                    {
+                        neutralPlayer = targetPlayer[i];
+                        break;
+                    }
+                }
+                Blockade *blockade = new Blockade(p,defendList[numTerritory]);//,neutralPlayer);
+                p->issueOrderObject(*blockade);
+        	}
+            if (card=="diplomacy")
+            {
+                int index = p->getHand()->findCard(DIPLOMACY);
+                for (int i=0; i<targetPlayer.size(); i++)
+                {
+                    cout<<i<<":"<<*targetPlayer[i]<<endl;
+                }
+                cout<<"Which player do you want to negotiate with?: ";
+                int target;
+                cin>>target;
+                p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand());
+                Negotiate *negotiate = new Negotiate(p,targetPlayer[target]);
+                p->issueOrderObject(*negotiate);
+        	}
         }
-    	if (*p->getHand()->cardAtIndex(cardIndex).getCardType()==cardType::BOMB)
-    	{
-            int randomAttackT = rand() % attackList.size()-1 + 0;
-         //   int targetPlayer = rand() % players.size()-1 + 0;
-            Bomb *bomb = new Bomb(targetPlayer,attackList[randomAttackT]);
-            p->issueOrderObject(*bomb);
-    	}
-        if (*p->getHand()->cardAtIndex(cardIndex).getCardType()==cardType::BLOCKADE)
-    	{
-            int randomDefendT = rand() % defendList.size()-1 + 0;
-            Blockade *blockade = new Blockade(p,defendList[randomDefendT], targetPlayer);
-            p->issueOrderObject(*blockade);
-    	}
-        if (*p->getHand()->cardAtIndex(cardIndex).getCardType()==cardType::DIPLOMACY)
-        {
- //           int targetPlayer = rand() % players.size()-1 + 0;
-            Negotiate *negotiate = new Negotiate(p,targetPlayer);
-            p->issueOrderObject(*negotiate);
-    	}
     }
-    	
-    int orderNum = rand() % 1 + 0; //randomly chooses if player will issue advance order
-    if (orderNum==1) //advance order
+    cout<<"Do you want to issue an advanced order? y/n: ";
+    string answer;
+    cin>>answer;
+    if (answer=="y")
     {
-        int randomPlayer = rand() % 2 + 0;
-        int source = rand() % defendList.size()-1 + 0;
-        int target = rand() % attackList.size()-1 + 0;
-        int army = rand() % defendList[source]->armyCount + 1;
-   //     int targetPlayer = rand() % players.size()-1 + 0;
-        Advance *advance = new Advance(p,targetPlayer,defendList[source],attackList[target],army);
+        for (int i=0; i<defendList.size(); i++)
+        {
+            cout<<i<<": "<<*defendList[i]<<endl;
+        }
+        cout<<"Which territory do you want to advance?: ";
+        int source,target,army;
+        cin>>source;
+        vector<Territory*> neighbours;
+        for(int i = 0; i < defendList[source]->edges.size(); i++)
+        {
+            if (defendList[source]!=defendList[source]->edges[i])
+            {
+                cout<<i<<": "<< *defendList[source]->edges[i]<<endl;
+                neighbours.push_back(defendList[source]->edges[i]);
+            }
+        }
+        cout<<"Which territory do you want to target the advance?: ";
+        cin>>target;
+        Player * targetP;
+        for (int i=0; i<targetPlayer.size(); i++)
+        {
+            cout<<"Territory size: " << targetPlayer[i]->getTerritories().size()<< endl;;
+            for (int t=0; t<targetPlayer[i]->getTerritories().size(); t++)
+            {
+                if (std::find(targetPlayer[i]->getTerritories().begin(), targetPlayer[i]->getTerritories().end(), neighbours[target]) != targetPlayer[i]->getTerritories().end()) 
+                {
+                    targetP = targetPlayer[i];
+                    break;
+                }
+            }
+        }
+        cout<<"How many armies do you want to advance (choose between 1-" << defendList[source]->armyCount << ")?: ";
+        cin>>army;
+        Advance *advance = new Advance(p,targetP,defendList[source],neighbours[target],army);
         p->issueOrderObject(*advance);
     }
 }
-
 void Player::issuingOrder(Player* p, Player* targetPlayer, Deck* deck)
 {
     deployArmies(p);
