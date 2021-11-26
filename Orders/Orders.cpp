@@ -128,6 +128,16 @@ void OrderList::deleteOrder(int index) {
     orderList.erase(orderList.begin() + index);
 }
 
+void OrderList::deleteAllOrder()
+{
+    for (Order *order : orderList)
+    {
+        delete order;
+        order = nullptr;
+    }
+    orderList.clear();
+}
+
 //Do we have this order present
 bool OrderList::hasOrder(string orderType) {
     for (Order *order : orderList) {
