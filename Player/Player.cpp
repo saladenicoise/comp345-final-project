@@ -322,7 +322,7 @@ void Player::selectOrder(Player* p, vector<Player*> targetPlayer, Deck* deck)
                         break;
                     }
                 }
-                Blockade *blockade = new Blockade(p,defendList[numTerritory]);//,neutralPlayer);
+                Blockade *blockade = new Blockade(p,defendList[numTerritory],neutralPlayer);
                 p->issueOrderObject(*blockade);
         	}
             if (card=="diplomacy")
