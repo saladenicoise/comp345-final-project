@@ -62,6 +62,7 @@ public:
     void addOrder(Order* order);
     //Deletes an order from our list
     void deleteOrder(int index);
+    void deleteAllOrder();
     //Moves an order from one index to a new one
     void moveOrder(string orderType, int newIndex);
 
