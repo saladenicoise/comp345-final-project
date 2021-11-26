@@ -433,36 +433,30 @@ void GameEngine::executeOrderPhase(vector<Player*> player)
 {    
     cout<<"\nStarting Execute Order Phase..."<<endl;
     Order *currentOrder;
-    Order *narrative;
-    OrderList narrativeOrder;
+    OrderList* orderlist;
     for (int i=0; i<player.size(); i++)
     {
-        //std::cout << "Player "<<player[i]->getPID() <<"'s order list: \n" << *player[i]->getOrderList() <<std::endl;
-        for (int j=0; j<player[i]->getOrderList()->getSize(); i++)
+        std::cout << "Player "<<player[i]->getPID() <<"'s order list: \n" << *player[i]->getOrderList() <<std::endl;
+        for (int j=0; j<player[i]->getOrderList()->getSize(); j++)
         {    
-            std::string str (player[i]->getOrderList()->getIndex(j)->getOrderType() + " ");
             currentOrder = player[i]->getOrderList()->getIndex(j);
             currentOrder->execute();
-            string isValid = currentOrder->validate() ? "true" : "false";
-            narrative = new Order(str.append(isValid));
-            narrativeOrder.addOrder(narrative);
         }
+        player[i]->olst->deleteAllOrder();     //deletes order list of each player for next turn 
     }
-    
-    cout<<"Narrative:\n"<<narrativeOrder<<endl;
 }
-
-
-
 
 void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck,int mapSize)
 {
+    int count = 1;
     srand (time(NULL));
     while (true)
     {
+        cout<<"-----------------------------------------------------"<<endl;
+        cout<<"Turn "<<count<<endl;
         int targetPlayer = rand() % players.size()-1 + 0;
         reinforcementPhase(map,players);
-        issueOrderPhase(players,players[targetPlayer],deck);
+        issueOrderPhase(players,players,deck);
         executeOrderPhase(players);
         int i = 0;
         i++;
@@ -477,6 +471,6 @@ void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, De
             cout<<"Player " << players[i]->getPID() << " won" << endl;
             break;
         }
-        
+        count++;
     }
 }
