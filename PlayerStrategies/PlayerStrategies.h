@@ -24,6 +24,7 @@ public:
     virtual vector<Territory*> toDefend(vector<Territory*> Map, Player &player) = 0;
     virtual vector<Territory*> toAttack(vector<Territory*> Map, Player &player) = 0;
     virtual void issueOrder(Player *p, vector<Player*> players, Deck* deck) = 0;
+    virtual void deployArmies(Player* p) = 0;
 
     // Stream insertion operator
     friend std::ostream& operator<<(std::ostream& os, const PlayerStrategy& strategy);
@@ -54,3 +55,23 @@ class HumanPlayerStrategy : public PlayerStrategy {
     HumanPlayerStrategy& operator =(const HumanPlayerStrategy& strategy);
 };
 
+class BenevolentPlayerStrategy : public PlayerStrategy {
+    public:
+    BenevolentPlayerStrategy(); // Default constructor
+    
+    BenevolentPlayerStrategy(const BenevolentPlayerStrategy& strategy); // Copy constructor
+    ~BenevolentPlayerStrategy(); // Destructor
+
+    // Strategy Methods inherited
+    vector<Territory*> toDefend(vector<Territory*> Map, Player &player);
+    vector<Territory*> toAttack(vector<Territory*> Map, Player &player);
+    void issueOrder(Player *p, vector<Player*> players, Deck* deck);
+    void deployArmies(Player *p);
+
+
+    // Stream insertion operator
+    friend std::ostream& operator<<(std::ostream& os, const BenevolentPlayerStrategy& strategy);
+
+    // Assignment Operator
+    BenevolentPlayerStrategy& operator =(const BenevolentPlayerStrategy& strategy);
+};
