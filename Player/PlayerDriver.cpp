@@ -26,7 +26,7 @@ int main() {
     vector <Player*> players = {player, player2};
     
     player->setStrategy(new HumanPlayerStrategy());
-    player2->setStrategy(new HumanPlayerStrategy());
+    player2->setStrategy(new BenevolentPlayerStrategy());
 
     player->toAttack(p1,*player);
     player->toDefend(p1,*player);
