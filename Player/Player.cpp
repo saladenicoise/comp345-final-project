@@ -211,49 +211,9 @@ void Player::issueOrderObject(const Order) //creates an order object and adds it
     this->olst->addOrder(newOrder);
 }
 
-
-void Player::deployArmies(Player* p) 	
-{
-    int initialReinforcementPool = getReinforcementPool();
-    do
-    {
-        if(getReinforcementPool() == 0) continue;
-        cout<<"Player " << p->getPID() <<" How many armies of your " <<p->getReinforcementPool() <<" do you want to deploy?: ";
-        int numtoDeploy;
-        cin>>numtoDeploy;
-        cout<<"Which territory do you want to deploy?: \n";
-        for (int i=0; i<defendList.size(); i++)
-        {
-            cout<<i<<": "<<*defendList[i]<<endl;
-        }
-        int numTerritory;
-        cin>>numTerritory;
-        if((numtoDeploy > 0) && (numtoDeploy <= p->getReinforcementPool()))
-        {
-            defendList[numTerritory]->armyCount += numtoDeploy;
-            p->setReinforcementPool(p->getReinforcementPool()-numtoDeploy);
-            Deploy *deploy;
-            deploy = new Deploy(p,defendList[numTerritory],numtoDeploy);
-            p->issueOrderObject(*deploy);
-            cout<<"ReinforcementPool:"<<p->getReinforcementPool()<<endl;
-            tempReinforcementPool = getReinforcementPool();
-        }
-    }while(getReinforcementPool()!=0);
-
-    if (getReinforcementPool()==0)
-    {
-        p->setReinforcementPool(initialReinforcementPool);//sets it back to original reinforcementPool when we call execution in GameEngine
-    }
-}
-
 void Player::issuingOrder(Player* p, vector<Player*> targetPlayer, Deck* deck)
 {
-    deployArmies(p);
-
-    if (tempReinforcementPool==0) //makes sure that no other order is issued until player has deployed all its armies
-    {
-        return this->strategy->issueOrder(p,targetPlayer, deck);
-    }
+    return this->strategy->issueOrder(p,targetPlayer, deck);
 }
 
 void Player::setStrategy(PlayerStrategy *newStrategy) {
