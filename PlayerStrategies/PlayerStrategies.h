@@ -46,6 +46,7 @@ class HumanPlayerStrategy : public PlayerStrategy {
     vector<Territory*> toDefend(vector<Territory*> Map, Player &player);
     vector<Territory*> toAttack(vector<Territory*> Map, Player &player);
     void issueOrder(Player *p, vector<Player*> players, Deck* deck);
+    int tempReinforcementPool;
 
     // Stream insertion operator
     friend std::ostream& operator<<(std::ostream& os, const HumanPlayerStrategy& strategy);
