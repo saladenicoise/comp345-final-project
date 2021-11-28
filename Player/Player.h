@@ -53,7 +53,6 @@ class Player //this is the Player class
         void issuingOrder(Player *p, vector<Player*> targetPlayer, Deck* deck);
         void issueOrderObject(const Order); //creates an order object and adds it to the list of orders. 
         int getOrderSize(int size); //returns order list object
-        void deployArmies(Player *p);
         void selectOrder(Player *p, vector<Player*> targetPlayer, Deck* deck);
         vector<Territory*> getTerritories();
         
