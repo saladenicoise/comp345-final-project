@@ -24,18 +24,21 @@ int main() {
     player->setTerritories(p1);
     player2->setTerritories(p2);
     vector <Player*> players = {player, player2};
-    cout << "do I get here";
+    
+    player->setStrategy(new HumanPlayerStrategy());
+    player2->setStrategy(new HumanPlayerStrategy());
+
     player->toAttack(p1,*player);
     player->toDefend(p1,*player);
     player2->toAttack(p2,*player2);
     player2->toDefend(p2,*player2);
-    
-    Deck *deck = new Deck();
-    for (int i = 0; i < 5; i++) 
-    {
-        deck->draw(player->getHand());
-    }
+     
+    Deck* deck= new Deck(30);
 
+    for (int i = 0; i < 5; i++) {
+        deck->draw(player->getHand());
+        deck->draw(player2->getHand());
+    }
     GameEngine g("console");
     g.mainGameLoop(map->territories,players,deck, map->territories.size());
 

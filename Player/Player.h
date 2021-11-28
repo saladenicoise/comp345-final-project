@@ -7,17 +7,20 @@
 #include <vector>
 #include <iostream>
 #include <ostream> 
+#include <algorithm>
 
 #include "../Orders/Orders.h"
 #include "../Map/Map.h"
 #include "../Cards/Cards.h"
+#include "../PlayerStrategies/PlayerStrategies.h"
 
-class Player;
 class Territory;
 class Hand;
 class OrderList;
 class Order;
 class Deck;
+class PlayerStrategy;
+
 class Player //this is the Player class
 {
     
@@ -47,14 +50,23 @@ class Player //this is the Player class
         void setGetCard(int getCard);
         int getGetCard();
         vector<Territory*> getNeighbour(vector<Territory*>);
-        void issuingOrder(Player *p, Player* targetPlayer, Deck* deck);
+        void issuingOrder(Player *p, vector<Player*> targetPlayer, Deck* deck);
         void issueOrderObject(const Order); //creates an order object and adds it to the list of orders. 
         int getOrderSize(int size); //returns order list object
         void deployArmies(Player *p);
-        void selectOrder(Player *p, Player* playerTarget, Deck* deck);
+        void selectOrder(Player *p, vector<Player*> targetPlayer, Deck* deck);
         vector<Territory*> getTerritories();
+        
         vector<Territory*> toDefend(vector<Territory*>, Player& p);
-       vector<Territory*> toAttack(vector<Territory*>, Player& p);
+        vector<Territory*> toAttack(vector<Territory*>, Player& p);
+
+        vector<Territory*> getDefendList();
+        void setDefendList(vector<Territory*> newDefendList);
+        vector<Territory*> getAttackList();
+        void setAttackList(vector<Territory*> newAttackList);
+
+        void setStrategy(PlayerStrategy *newStrategy);
+        PlayerStrategy* getPlayerStrategy();
 
 
     private: // data members
@@ -67,9 +79,10 @@ class Player //this is the Player class
         vector<Player*> cannotAttack;
         int isNeutral;
         int getCard;
+        int tempReinforcementPool;
+        PlayerStrategy *strategy;
         vector<Territory*> attackList;
         vector<Territory*> defendList;
-        int tempReinforcementPool;
 
         friend class GameEngine;
 };
