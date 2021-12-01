@@ -20,6 +20,7 @@ class OrderList;
 class Order;
 class Deck;
 class PlayerStrategy;
+class GameEngine;
 
 class Player //this is the Player class
 {
@@ -50,7 +51,7 @@ class Player //this is the Player class
         void setGetCard(int getCard);
         int getGetCard();
         vector<Territory*> getNeighbour(vector<Territory*>);
-        void issuingOrder(Player *p, vector<Player*> targetPlayer, Deck* deck);
+        void issuingOrder(Player* p, GameEngine *game, Deck* deck);
         void issueOrderObject(const Order); //creates an order object and adds it to the list of orders. 
         int getOrderSize(int size); //returns order list object
         void selectOrder(Player *p, vector<Player*> targetPlayer, Deck* deck);

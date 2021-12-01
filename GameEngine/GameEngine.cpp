@@ -215,6 +215,7 @@ void GameEngine::startupPhase(std::string command) {
                     Territory* randTerritory = copiedTerritories[random];
                     randTerritory->setOwnerId((*it)->getPID());
                     (*it)->t.push_back(randTerritory);
+                    (*it)->defendList.push_back(randTerritory);
                     copiedTerritories.erase(copiedTerritories.begin() + random);
                     copiedTerritories.shrink_to_fit();
                 }
@@ -261,6 +262,8 @@ void GameEngine::startupPhase(std::string command) {
         commandProcessor->commands.back()->saveEffect(transitionString);
         std::cout << "\nNow Entering the Play Phase!\n" << std::endl;
         nextValidCommands->clear();
+
+        mainGameLoop(map->territories,players,deck, map->territories.size(), this);
     }
     
 }
@@ -421,11 +424,11 @@ void GameEngine::reinforcementPhase(vector<Territory*> map, vector<Player*> play
     }
 }
 
-void GameEngine::issueOrderPhase(vector<Player*> player,Player* targetPlayer, Deck* deck)
+void GameEngine::issueOrderPhase(vector<Player*> player,GameEngine *game, Deck* deck)
 {
     for (int i=0; i<player.size(); i++)
     {
-        player[i]->issuingOrder(player[i],targetPlayer, deck);
+        player[i]->issuingOrder(player[i],game, deck);
     }
 
 }
@@ -446,16 +449,25 @@ void GameEngine::executeOrderPhase(vector<Player*> player)
     }
 }
 
-void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck,int mapSize)
+vector<Player*> GameEngine::getPlayersList(){ // get players
+	return players;
+}
+
+void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck,int mapSize, GameEngine *game)
 {
     int count = 1;
     srand (time(NULL));
+    for(auto p : players){
+        p->setStrategy(new HumanPlayerStrategy());
+        p->toAttack(p->getAttackList(),*p);
+        p->toDefend(p->getDefendList(),*p);
+    }
     while (true)
     {
         cout<<"-----------------------------------------------------"<<endl;
         cout<<"Turn "<<count<<endl;
         reinforcementPhase(map,players);
-        issueOrderPhase(players,players,deck);
+        issueOrderPhase(players,game,deck);
         executeOrderPhase(players);
         int i = 0;
         i++;

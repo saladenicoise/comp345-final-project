@@ -211,9 +211,9 @@ void Player::issueOrderObject(const Order) //creates an order object and adds it
     this->olst->addOrder(newOrder);
 }
 
-void Player::issuingOrder(Player* p, vector<Player*> targetPlayer, Deck* deck)
+void Player::issuingOrder(Player* p, GameEngine *game, Deck* deck)
 {
-    return this->strategy->issueOrder(p,targetPlayer, deck);
+    return this->strategy->issueOrder(p,game, deck);
 }
 
 void Player::setStrategy(PlayerStrategy *newStrategy) {

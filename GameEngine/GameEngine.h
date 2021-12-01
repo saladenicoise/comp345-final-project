@@ -85,6 +85,8 @@ public:
     // getter function for commandsFilename
     std::string getCommandsFileName();
 
+    vector<Player*> getPlayersList();
+
     // setter function for attribute state declaration
     void setState(std::string state);
 
@@ -105,9 +107,9 @@ public:
     std::string stringToLog();
 
     void reinforcementPhase(vector<Territory*> map, vector<Player*> players);
-    void issueOrderPhase(vector<Player*> player, Player* targetPlayer, Deck* deck);
+    void issueOrderPhase(vector<Player*> player,GameEngine *game, Deck* deck);
     void executeOrderPhase(vector<Player*> player);
-    void mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck,int mapSize);
+    void mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck,int mapSize, GameEngine *game);
 
 };
 

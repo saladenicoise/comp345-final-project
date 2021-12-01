@@ -40,7 +40,7 @@ int main() {
         deck->draw(player2->getHand());
     }
     GameEngine g("console");
-    g.mainGameLoop(map->territories,players,deck, map->territories.size());
+    g.mainGameLoop(map->territories,players,deck, map->territories.size(), &g);
 
 
 

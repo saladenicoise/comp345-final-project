@@ -1,6 +1,7 @@
 #include "PlayerStrategies.h"
 #include "../Player/Player.h"
 #include "../Orders/Orders.h"
+#include "../GameEngine/GameEngine.h"
 #include <iostream>
 using std::cin;
 using std::cout;
@@ -87,10 +88,13 @@ HumanPlayerStrategy &HumanPlayerStrategy::operator=(const HumanPlayerStrategy &s
     return *this;
 }
 
-void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* deck){
+void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
     int initialReinforcementPool = p->getReinforcementPool();
+    vector<Player *> players = game->getPlayersList();
+
     do
     {
+        
         if(p->getReinforcementPool() == 0) continue;
         cout<<"Player " << p->getPID() <<" How many armies of your " <<p->getReinforcementPool() <<" do you want to deploy?: ";
         int numtoDeploy;
@@ -126,12 +130,14 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
             cout<<"Do you want to issue an order from your cards? y/n: ";
             string answer;
             cin>>answer;
+            cout << endl;
             if (answer=="y")
             {
                 cout<<"\n"<<*p->getHand();
                 cout<<"Which card would you like to select?: ";
                 string card;
                 cin>>card;
+                cout << endl;
                 if (card=="airlift")
                 {
                     int index = p->getHand()->findCard(AIRLIFT);
@@ -143,10 +149,13 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
                     cout<<"Which territory do you want to airlift?: ";
                     int source,target,army;
                     cin>>source;
+                    cout << endl;
                     cout<<"Which territory do you want to target?: ";
                     cin>>target;
+                    cout << endl;
                     cout<<"How many armies do you want to airlift (choose between 1-" << p->getDefendList()[source]->armyCount << ")?: ";
                     cin>>army;
+                    cout << endl;
                     Airlift *airlift = new Airlift(p,p->getDefendList()[source],p->getDefendList()[target],army);
                     p->issueOrderObject(*airlift);
                 }
@@ -185,6 +194,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
                     cout<<"Which territory do you want to blockade?: ";
                     int numTerritory;
                     cin>>numTerritory;
+                    cout << endl;
                     Player* neutralPlayer;
                     for (int i=0; i<players.size(); i++)
                     {
@@ -194,7 +204,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
                             break;
                         }
                     }
-                    Blockade *blockade = new Blockade(p,p->getDefendList()[numTerritory]);//,neutralPlayer);
+                    Blockade *blockade = new Blockade(p,p->getDefendList()[numTerritory],neutralPlayer);
                     p->issueOrderObject(*blockade);
             	}
                 if (card=="diplomacy")
@@ -207,6 +217,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
                     cout<<"Which player do you want to negotiate with?: ";
                     int target;
                     cin>>target;
+                    cout << endl;
                     p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand());
                     Negotiate *negotiate = new Negotiate(p,players[target]);
                     p->issueOrderObject(*negotiate);
@@ -214,7 +225,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
                 if (card=="reinforcement")
                 {
                     int index = p->getHand()->findCard(REINFORCEMENT);
-                    cout<<"Adding 5 reinforcement armies!\n";
+                    cout<<"Adding 5 reinforcement armies!" << endl;
                     p->setReinforcementPool(p->getReinforcementPool()+5);
                     p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand());
             	}
@@ -223,6 +234,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
         cout<<"Do you want to issue an advanced order? y/n: ";
         string answer;
         cin>>answer;
+        cout << endl;
         if (answer=="y")
         {
             for (int i=0; i<p->getDefendList().size(); i++)
@@ -232,6 +244,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
             cout<<"Which territory do you want to advance?: ";
             int source,target,army;
             cin>>source;
+            cout << endl;
             vector<Territory*> neighbours;
             for(int i = 0; i < p->getDefendList()[source]->edges.size(); i++)
             {
@@ -243,6 +256,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
             }
             cout<<"Which territory do you want to target the advance?: ";
             cin>>target;
+            cout << endl;
             Player * targetP;
             for (int i=0; i<players.size(); i++)
             {
@@ -251,6 +265,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* d
                 {
                     if (std::find(players[i]->getTerritories().begin(), players[i]->getTerritories().end(), neighbours[target]) != players[i]->getTerritories().end()) 
                     {
+                        cout << "Player Found" <<endl;
                         targetP = players[i];
                         break;
                     }
@@ -316,7 +331,7 @@ BenevolentPlayerStrategy &BenevolentPlayerStrategy::operator=(const BenevolentPl
     return *this;
 }
 
-void BenevolentPlayerStrategy::issueOrder(Player *p, vector<Player*> players, Deck* deck)
+void BenevolentPlayerStrategy::issueOrder(Player* p, GameEngine *game, Deck* deck)
 {
         int index = 0;
     for (int i=0; i<p->getDefendList().size(); i++)
