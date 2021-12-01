@@ -183,7 +183,7 @@ vector<Territory*> Player::getNeighbour(vector<Territory*> Map) //finds the neig
       for(int j = 0; j < t[i]->edges.size(); j++){
           bool contains = false;
           for(Territory* terr : neighbouring_terrritories){
-              if (terr = t[i]->edges[j]){
+              if (terr = t[i]->edges[j] && (std::find(getTerritories().begin(), getTerritories().end(), defendList()[i]) != getTerritories().end())){
                   contains = true;
               }
           }
