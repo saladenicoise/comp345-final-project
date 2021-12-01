@@ -75,3 +75,43 @@ class BenevolentPlayerStrategy : public PlayerStrategy {
     // Assignment Operator
     BenevolentPlayerStrategy& operator =(const BenevolentPlayerStrategy& strategy);
 };
+
+class NeutralPlayerStrategy : public PlayerStrategy {
+    public:
+    NeutralPlayerStrategy(); // Default constructor
+    
+    NeutralPlayerStrategy(const NeutralPlayerStrategy& strategy); // Copy constructor
+    ~NeutralPlayerStrategy(); // Destructor
+
+    // Strategy Methods inherited
+    vector<Territory*> toDefend(vector<Territory*> Map, Player &player);
+    vector<Territory*> toAttack(vector<Territory*> Map, Player &player);
+    void issueOrder(Player *p, GameEngine *game, Deck* deck);
+
+
+    // Stream insertion operator
+    friend std::ostream& operator<<(std::ostream& os, const NeutralPlayerStrategy& strategy);
+
+    // Assignment Operator
+    NeutralPlayerStrategy& operator =(const NeutralPlayerStrategy& strategy);
+};
+
+class CheaterPlayerStrategy : public PlayerStrategy {
+    public:
+    CheaterPlayerStrategy(); // Default constructor
+    
+    CheaterPlayerStrategy(const CheaterPlayerStrategy& strategy); // Copy constructor
+    ~CheaterPlayerStrategy(); // Destructor
+
+    // Strategy Methods inherited
+    vector<Territory*> toDefend(vector<Territory*> Map, Player &player);
+    vector<Territory*> toAttack(vector<Territory*> Map, Player &player);
+    void issueOrder(Player *p, GameEngine *game, Deck* deck);
+
+
+    // Stream insertion operator
+    friend std::ostream& operator<<(std::ostream& os, const CheaterPlayerStrategy& strategy);
+
+    // Assignment Operator
+    CheaterPlayerStrategy& operator =(const CheaterPlayerStrategy& strategy);
+};
