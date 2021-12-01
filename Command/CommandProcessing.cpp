@@ -101,11 +101,24 @@ bool CommandProcessor::checkIfValidTourneyCommand(string command) {
     for(int i = 0; i < out.size(); i++) {
         if(out[i].rfind("M", 0) == 0) {//Map Files
             regex mapDelim(" ");
-            vector<string> mapFiles(sregex_token_iterator(out[i].begin(), out[i].end(), mapDelim, -1), sregex_token_iterator());
+            vector<string> mapFiless(sregex_token_iterator(out[i].begin(), out[i].end(), mapDelim, -1), sregex_token_iterator());
+            for(string mapF : mapFiless) {
+                mapFiles.push_back(mapF);
+            }
         }
         if(out[i].rfind("P", 0) == 0) {//Player Strategies
             regex playerDelim(" ");
-            vector<string> playerStrategies(sregex_token_iterator(out[i].begin(), out[i].end(), playerDelim, -1), sregex_token_iterator());
+            vector<string> playerStrategiess(sregex_token_iterator(out[i].begin(), out[i].end(), playerDelim, -1), sregex_token_iterator());
+            //Check if strategies are valid
+            for(string strategy : playerStrategiess) {
+                if(strategy != "P") {
+                    if (!(strategy == "Aggressive" || strategy == "Benevolent" || strategy == "Neutral" || strategy == "Cheater")) {//Not valid strategy
+                        cout << strategy << " is not a valid strategy type only: Aggresive, Benevolent, Neutral, or Cheater are accepted." << endl;
+                        return false;
+                    }
+                    playerStrategies.push_back(strategy);
+                }
+            }
         }
         if(out[i].rfind("G", 0) == 0) {//Number of Games
             numOfGames = stoi(out[i].substr(2, out[i].length()));
@@ -116,15 +129,24 @@ bool CommandProcessor::checkIfValidTourneyCommand(string command) {
     }
     //At least: 1 map, 2 player strategies, 1 Game, 1 Round
     if((mapFiles.size() > 0 && mapFiles.size() < 6) && (playerStrategies.size() > 1 && playerStrategies.size() < 5)&& (numOfGames > 0 && numOfGames < 6) && (maxNumOfTurns > 9 && maxNumOfTurns < 51)) {
+        cout << "Valid Tournament Command" << endl;
         return true;
     }else{
+        cout << "Map Files Size(): " << mapFiles.size() << endl;
+        cout << "Map Files Condition: " << (mapFiles.size() > 0 && mapFiles.size() < 6) << endl;
+        cout << "Player Strats Size: " << playerStrategies.size() << endl;
+        cout << "Player Strats Condition: " << (playerStrategies.size() > 1 && playerStrategies.size() < 5) << endl;
+        cout << "Number of Games: " << numOfGames << endl;
+        cout << "Number of Games Condition: " << (numOfGames > 0 && numOfGames < 6) << endl;
+        cout << "Max Num of Turns: " << maxNumOfTurns << endl;
+        cout << "Max Num of Turns Condition: " << (maxNumOfTurns > 9 && maxNumOfTurns < 51) << endl;
         return false;
     }
 }
 
 bool CommandProcessor::checkIfValidCommand(string command) {
-    if (command == "start" || command == "loadmap" || command == "validatemap" || command == "addplayer"
-        || command == "gamestart" || command == "replay" || command == "quit") {
+    if (command == "tournament" || command == "start" || command == "loadmap" || command == "validatemap" || command == "addplayer"
+        || command == "gamestart" || command=="tourneystart" || command == "replay" || command == "quit") {
 
         return true;
     }

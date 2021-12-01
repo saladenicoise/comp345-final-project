@@ -119,15 +119,21 @@ void GameEngine::doTransition(std::string command) {
 
 void GameEngine::startupPhase(std::string command) {
     bool valid = false;
+    std::string oldState;
+    std::string transitionString;
+    std::string tournamentCommand;
     if (command == "tournament") {//Does it start with tournament
+        oldState = *state;
+        setState("tournament");
+        transitionString = displayTransition(oldState, state, command);
+        commandProcessor->commands.back()->saveEffect(transitionString);
+        nextValidCommands->clear();
         while (!valid) {
-            std::string tournamentCommand;
             cout << "Enter Tournament Command: ";
             getline(cin, tournamentCommand);
-            if (commandProcessor->checkIfValidTourneyCommand(tournamentCommand)) {
+            if(commandProcessor->checkIfValidTourneyCommand(tournamentCommand)) {
                 valid = true;
-                tournamentMode(tournamentCommand);
-                return; //We are done executing the startup phase
+                nextValidCommands->push_back("tourneystart");
             } else {
                 cout << "Invalid tournament command, try again" << endl;
             }
@@ -137,8 +143,6 @@ void GameEngine::startupPhase(std::string command) {
     // Declare variables
     load_map = new MapLoader();
     deck = new Deck(30);
-    std::string oldState;
-    std::string transitionString;
 
     // Start the game
     if(command == "start") {
@@ -219,7 +223,16 @@ void GameEngine::startupPhase(std::string command) {
                 nextValidCommands->push_back("gamestart"); // Only start playing with min 2 players
         }        
 
-    } else if (command == "gamestart") { // Start the game
+    }else if (command == "tourneystart"){
+        oldState = *state;
+        setState("tourneystart");
+        transitionString = displayTransition(oldState, state, command);
+        commandProcessor->commands.back()->saveEffect(transitionString);
+        std::cout << "\nTOURNAMENT NOW STARTING!" << std::endl;
+        std::cout << "LETS GET READY TO RUMBLE!!!!!!\n" << std::endl;
+        nextValidCommands->clear();
+        tournamentMode(tournamentCommand);
+    }else if (command == "gamestart") { // Start the game
 
         // Make copy of the territories
         vector<Territory*> copiedTerritories(map->territories.size());
