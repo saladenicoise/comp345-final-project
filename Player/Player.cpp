@@ -2,6 +2,8 @@
 #include <iostream>
 #include <ostream> 
 #include <string>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 Player::Player()
