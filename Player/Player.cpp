@@ -184,21 +184,33 @@ void Player::setGetCard(int getCard) {
 }
 
 vector<Territory*> Player::getNeighbour(vector<Territory*> Map) //finds the neighbouring teritories of a player
-{
+{  
     vector<Territory*> neighbouring_terrritories; //for each territory, find the neighbours of the territory
     for (int i = 0; i<t.size(); i++)
+    {   
+        for(int j = 0; j < t[i]->edges.size(); j++){
+            bool contains = false;
+            for(int k = 0; k< neighbouring_terrritories.size();k++){
+                if(std::find(neighbouring_terrritories.begin(), neighbouring_terrritories.end(), t[i]->edges[j]) != neighbouring_terrritories.end()){ // if in neighbour vector
+                    contains = true;
+                } else {
+                    neighbouring_terrritories.push_back(t[i]->edges[j]);
+                    contains = true;
+                }
+            }
+            if(!contains){
+                neighbouring_terrritories.push_back(t[i]->edges[j]);
+            }
+        }
+    }
+
+    for(int i = 0; i < getDefendList().size(); i++) // remove everything from defend list in neighbour list
     {
-      for(int j = 0; j < t[i]->edges.size(); j++){
-          bool contains = false;
-          for(Territory* terr : neighbouring_terrritories){
-              if (terr == t[i]->edges[j] && (std::find(getTerritories().begin(), getTerritories().end(), !defendList[i]) != getTerritories().end())){
-                  contains = true;
-              }
-          }
-          if(!contains){
-              neighbouring_terrritories.push_back(t[i]->edges[j]);
-          }
-      }
+        auto iter = std::find(neighbouring_terrritories.begin(),neighbouring_terrritories.end(),getDefendList()[i]);
+        if(iter != neighbouring_terrritories.end())
+        {
+            neighbouring_terrritories.erase(iter);
+        }
     }
     return neighbouring_terrritories;   //returns a player's list of territories that can be attacked
 }
