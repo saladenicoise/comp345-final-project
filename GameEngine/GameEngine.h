@@ -54,6 +54,10 @@ private:
     // Startup phase method to begin the game
     void startupPhase(std::string command);
 
+    void tournamentMode(std::string command);
+
+    void tournamentLoop(vector<string> mapFiles, vector<string> playerStrategies, int numOfGames, int maxNumOfRounds);
+
     // Variable declaration
     MapLoader *load_map;
     Map *map;

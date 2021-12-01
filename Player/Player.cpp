@@ -50,6 +50,7 @@ Player::Player(const Player& p) //copy constructor
     this->olst = p.olst;
     for (auto a : p.cannotAttack)
         this->cannotAttack.push_back(new Player(*a));
+    this->strategyString = p.strategyString;
 }
 
 Player::~Player() //destructor 
@@ -88,6 +89,7 @@ Player &Player::operator=(const Player &p) //assignment operator overloader to c
     this->h = p.h;
     this->olst = p.olst;
     this->cannotAttack = p.cannotAttack;
+    this->strategyString = p.strategyString;
     return *this;
 }
 
@@ -126,6 +128,10 @@ void Player::setNotAttackablePlayers(vector<Player*> cannotAttack) { //set not a
 
 vector<Territory*> Player::getTerritories(){ // get players territories
 	return t;
+}
+
+string Player::getPlayerStrategyString() {
+    return this->strategyString;
 }
 
 void Player::setTerritories(vector<Territory*> newTerritoryList) {
@@ -220,6 +226,10 @@ void Player::issuingOrder(Player* p, GameEngine *game, Deck* deck)
 
 void Player::setStrategy(PlayerStrategy *newStrategy) {
     this->strategy = newStrategy;
+}
+
+void Player::setStrategyString(string strategyString) {
+    this->strategyString = strategyString;
 }
 
 PlayerStrategy* Player::getPlayerStrategy() {

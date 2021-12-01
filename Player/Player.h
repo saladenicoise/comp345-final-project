@@ -65,6 +65,8 @@ class Player //this is the Player class
         vector<Territory*> getAttackList();
         void setAttackList(vector<Territory*> newAttackList);
 
+        string getPlayerStrategyString();
+        void setStrategyString(string strategyString);
         void setStrategy(PlayerStrategy *newStrategy);
         PlayerStrategy* getPlayerStrategy();
 
@@ -83,7 +85,7 @@ class Player //this is the Player class
         PlayerStrategy *strategy;
         vector<Territory*> attackList;
         vector<Territory*> defendList;
-
+        string strategyString;
         friend class GameEngine;
 };
 

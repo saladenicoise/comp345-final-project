@@ -1,10 +1,14 @@
 #include "GameEngine.h"
 #include <unordered_map>
+#include <regex>
+using std::regex;
+using std::sregex_token_iterator;
 // Defining the default constructor for GameEngine class
 GameEngine::GameEngine(string mode) {
     state = new std::string("pregame");
     nextValidCommands = new std::vector<std::string>;
     nextValidCommands->push_back("start");
+    nextValidCommands->push_back("tournament");
     ordersToExecute = new std::vector<std::string>;
     commandProcessor = new CommandProcessor();
     if(mode == "console") {
@@ -114,6 +118,22 @@ void GameEngine::doTransition(std::string command) {
 }
 
 void GameEngine::startupPhase(std::string command) {
+    bool valid = false;
+    if (command == "tournament") {//Does it start with tournament
+        while (!valid) {
+            std::string tournamentCommand;
+            cout << "Enter Tournament Command: ";
+            getline(cin, tournamentCommand);
+            if (commandProcessor->checkIfValidTourneyCommand(tournamentCommand)) {
+                valid = true;
+                tournamentMode(tournamentCommand);
+                return; //We are done executing the startup phase
+            } else {
+                cout << "Invalid tournament command, try again" << endl;
+            }
+        }
+    }
+
     // Declare variables
     load_map = new MapLoader();
     deck = new Deck(30);
@@ -266,6 +286,137 @@ void GameEngine::startupPhase(std::string command) {
         mainGameLoop(map->territories,players,deck, map->territories.size(), this);
     }
     
+}
+
+/**
+ * Parses the command and calls the main tournament loop
+ * @param command The tournament command
+ */
+void GameEngine::tournamentMode(std::string command) {
+    vector<string> mapFiles;
+    vector<string> playerStrategies;
+    int numOfGames = 0;
+    int maxNumOfTurns = 0;
+    regex delim("\\-");
+    vector<string> out(sregex_token_iterator(command.begin(), command.end(), delim, -1), sregex_token_iterator());
+    for(int i = 0; i < out.size(); i++) {
+        if(out[i].rfind("M", 0) == 0) {//Map Files
+            regex mapDelim(" ");
+            vector<string> mapFiles(sregex_token_iterator(out[i].begin(), out[i].end(), mapDelim, -1), sregex_token_iterator());
+        }
+        if(out[i].rfind("P", 0) == 0) {//Player Strategies
+            regex playerDelim(" ");
+            vector<string> playerStrategies(sregex_token_iterator(out[i].begin(), out[i].end(), playerDelim, -1), sregex_token_iterator());
+        }
+        if(out[i].rfind("G", 0) == 0) {//Number of Games
+            numOfGames = stoi(out[i].substr(2, out[i].length()));
+        }
+        if(out[i].rfind("D", 0) == 0) {//Number of turns
+            maxNumOfTurns = stoi(out[i].substr(2, out[i].length()));
+        }
+    }
+    tournamentLoop(mapFiles, playerStrategies, numOfGames, maxNumOfTurns);
+}
+
+void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerStrategies, int numOfGames, int maxNumOfRounds) {
+    string report[mapFiles.size()+1][numOfGames+1];
+    //Prep report:
+    report[0][0] = "";
+    int curMapNum = 1;
+    for(string mapF : mapFiles) { //Loop through every map file given
+        report[curMapNum][0] = mapF;
+        MapLoader mapLoader;
+        Map* map = mapLoader.loadMap(mapF+".map");
+        vector<Player *> players;
+        int pId = 1;
+        for(string playerStrat : playerStrategies) { //Create each player with the appropriate strategy
+            Player* player = new Player(playerStrat);
+            player->setpID(pId);
+            if(playerStrat == "Aggressive") { //Not implemented yet
+                //player->setStrategy(new AggresivePlayerStrategy());
+                //player->setStrategyString("Aggressive")
+            }
+            if(playerStrat == "Benevolent") {
+                player->setStrategy(new BenevolentPlayerStrategy());
+                player->setStrategyString("Benevolent");
+            }
+            if(playerStrat == "Neutral") {
+                player->setStrategy(new NeutralPlayerStrategy());
+                player->setStrategyString("Neutral");
+            }
+            if(playerStrat == "Cheater") {
+                player->setStrategy(new CheaterPlayerStrategy());
+                player->setStrategyString("Cheater");
+            }
+            players.push_back(player);
+        }
+        // Make copy of the territories
+        vector<Territory*> copiedTerritories(map->territories.size());
+        for(int i = 0; i < map->territories.size(); i++){
+            copiedTerritories[i] = map->territories[i];
+        }
+
+        //For every game we give them new territories
+        for(int curGame = 1; curGame < numOfGames+1; curGame++) {
+            report[0][curGame] = "Game " + curGame;
+            // a) fairly distribute all the territories to the players
+            while(copiedTerritories.size() != 0){
+                for(auto it = players.begin(); it != players.end(); ++it){
+                    if(copiedTerritories.size() != 0) {
+                        int random = rand() % copiedTerritories.size();
+                        Territory* randTerritory = copiedTerritories[random];
+                        randTerritory->setOwnerId((*it)->getPID());
+                        (*it)->t.push_back(randTerritory);
+                        (*it)->defendList.push_back(randTerritory);
+                        copiedTerritories.erase(copiedTerritories.begin() + random);
+                        copiedTerritories.shrink_to_fit();
+                    }
+                }
+            }
+
+            // Display players' territories and reinforcement pool
+            for(auto it = players.begin(); it != players.end(); ++it){
+                // c) give 50 initial armies to the players, which are placed in their respective reinforcement pool
+                (*it)->setReinforcementPool(50);
+
+                // d) let each player draw 2 initial cards from the deck using the deck’s draw() method
+                for (int i = 0; i < 2; i++) {
+                    deck->draw((*it)->getHand());
+                }
+            }
+            // b) determine randomly the order of play of the players in the game
+            unsigned seed = std::chrono::system_clock::now()
+                    .time_since_epoch()
+                    .count();
+            std::shuffle(std::begin(players), std::end(players), std::default_random_engine());
+
+            int round = 1;
+            srand(time(NULL));
+            bool winner = false;
+            while(round < maxNumOfRounds+1) {
+                cout << "------ Tournament Game " << curGame << " | Round: " << round << " ------" << endl;
+                reinforcementPhase(map->territories, players);
+                issueOrderPhase(players, this, deck);
+                executeOrderPhase(players);
+                for(int f = 0; f < players.size(); f++) {
+                    if(players[f]->defendList.size() == 0) {
+                        cout << "Player " << players[f]->getPID() << " has been eliminated" << endl;
+                        delete players[f];
+                        players[f] = nullptr; //Avoid dangling pointers
+                    }
+                    if(players[f]->getTerritories().size() == map->territories.size()) {
+                        cout << "Game " << curGame << " has been won by " << players[f] << endl;
+                        report[curMapNum][curGame] = players[f]->getPlayerStrategyString();
+                        winner = true;
+                        break;
+                    }
+                }
+            }
+            if(winner == false) {//No one won and we ran out of rounds thus draw
+                report[curMapNum][curGame] = "Draw";
+            }
+        }
+    }
 }
 
 // Defining the support function responsible for displaying the current transition taking place

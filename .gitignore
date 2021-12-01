@@ -33,3 +33,7 @@
 
 #VSCODE config files
 .vscode
+#MISC
+.idea
+cmake-build-debug
+CMakeLists.txt

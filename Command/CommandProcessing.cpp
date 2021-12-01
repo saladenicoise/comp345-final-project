@@ -1,4 +1,10 @@
 #include "CommandProcessing.h"
+#include <string>
+using std::string;
+using std::stoi;
+#include <regex>
+using std::regex;
+using std::sregex_token_iterator;
 
 Command::Command() {} // Default constructor for Command class.
 
@@ -85,9 +91,40 @@ void CommandProcessor::getCommand() {
 
 }
 
+bool CommandProcessor::checkIfValidTourneyCommand(string command) {
+    vector<string> mapFiles;
+    vector<string> playerStrategies;
+    int numOfGames = 0;
+    int maxNumOfTurns = 0;
+    regex delim("\\-");
+    vector<string> out(sregex_token_iterator(command.begin(), command.end(), delim, -1), sregex_token_iterator());
+    for(int i = 0; i < out.size(); i++) {
+        if(out[i].rfind("M", 0) == 0) {//Map Files
+            regex mapDelim(" ");
+            vector<string> mapFiles(sregex_token_iterator(out[i].begin(), out[i].end(), mapDelim, -1), sregex_token_iterator());
+        }
+        if(out[i].rfind("P", 0) == 0) {//Player Strategies
+            regex playerDelim(" ");
+            vector<string> playerStrategies(sregex_token_iterator(out[i].begin(), out[i].end(), playerDelim, -1), sregex_token_iterator());
+        }
+        if(out[i].rfind("G", 0) == 0) {//Number of Games
+            numOfGames = stoi(out[i].substr(2, out[i].length()));
+        }
+        if(out[i].rfind("D", 0) == 0) {//Number of turns
+            maxNumOfTurns = stoi(out[i].substr(2, out[i].length()));
+        }
+    }
+    //At least: 1 map, 2 player strategies, 1 Game, 1 Round
+    if((mapFiles.size() > 0 && mapFiles.size() < 6) && (playerStrategies.size() > 1 && playerStrategies.size() < 5)&& (numOfGames > 0 && numOfGames < 6) && (maxNumOfTurns > 9 && maxNumOfTurns < 51)) {
+        return true;
+    }else{
+        return false;
+    }
+}
+
 bool CommandProcessor::checkIfValidCommand(string command) {
     if (command == "start" || command == "loadmap" || command == "validatemap" || command == "addplayer"
-        || command == "gamestart" || command == "replay" || command == "quit" ) {
+        || command == "gamestart" || command == "replay" || command == "quit") {
 
         return true;
     }

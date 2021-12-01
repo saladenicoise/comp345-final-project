@@ -41,6 +41,7 @@ public:
     bool checkIfValidCommand(string command); // check if valid command
     bool validate(string command, vector<string> nextValidCommands); // validate method for next viable command
     std::string stringToLog(); // string to log function
+    bool checkIfValidTourneyCommand(string command);
     // Friend operator overloading insertion operator that outputs 
     friend std::ostream& operator<<(std::ostream& os, const CommandProcessor& c);
     // Overloaded assignment opperator, to allow chaining operations
