@@ -514,6 +514,23 @@ vector<Territory*> AggressivePlayerStrategy::toAttack(vector<Territory*> Map, Pl
 
 void AggressivePlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck *deck) {
 
+    // Getting the strongest country index.
+    int maxArmiesIndex = 0;
+    for(int i = 1; i < p->getDefendList().size(); i++) {
+        if(p->getDefendList()[i]->armyCount > p->getDefendList()[maxArmiesIndex]->armyCount) {
+            maxArmiesIndex = i;
+        }
+    }
+
+    // Deploying armies from the reinforcement pool in the strongest country
+    Deploy *deploy = new Deploy(p,p->getDefendList()[maxArmiesIndex],p->getReinforcementPool());
+    p->issueOrderObject(deploy);
+
+    vector<Territory*> placeholder;
+    vector<Territory*> neighbours = p->getNeighbour(placeholder);
+    Territory* strongestCountry = p->getDefendList()[maxArmiesIndex];
+
+    
 }
 
 
