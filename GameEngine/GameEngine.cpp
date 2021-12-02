@@ -4,6 +4,8 @@
 using std::regex;
 using std::sregex_token_iterator;
 // Defining the default constructor for GameEngine class
+
+std::string tournamentCommand;
 GameEngine::GameEngine(string mode) {
     state = new std::string("pregame");
     nextValidCommands = new std::vector<std::string>;
@@ -121,7 +123,6 @@ void GameEngine::startupPhase(std::string command) {
     bool valid = false;
     std::string oldState;
     std::string transitionString;
-    std::string tournamentCommand;
     if (command == "tournament") {//Does it start with tournament
         oldState = *state;
         setState("tournament");
@@ -224,6 +225,7 @@ void GameEngine::startupPhase(std::string command) {
         }        
 
     }else if (command == "tourneystart"){
+        cout << "Tournament Command Start: " << tournamentCommand << endl;
         oldState = *state;
         setState("tourneystart");
         transitionString = displayTransition(oldState, state, command);
@@ -306,6 +308,7 @@ void GameEngine::startupPhase(std::string command) {
  * @param command The tournament command
  */
 void GameEngine::tournamentMode(std::string command) {
+    cout << "In Tournament Mode" << endl;
     vector<string> mapFiles;
     vector<string> playerStrategies;
     int numOfGames = 0;
@@ -315,11 +318,22 @@ void GameEngine::tournamentMode(std::string command) {
     for(int i = 0; i < out.size(); i++) {
         if(out[i].rfind("M", 0) == 0) {//Map Files
             regex mapDelim(" ");
-            vector<string> mapFiles(sregex_token_iterator(out[i].begin(), out[i].end(), mapDelim, -1), sregex_token_iterator());
+            vector<string> mapFiless(sregex_token_iterator(out[i].begin(), out[i].end(), mapDelim, -1), sregex_token_iterator());
+            for(string mapF : mapFiless) {
+                if(mapF != "M") {
+                    mapFiles.push_back(mapF);
+                }
+            }
         }
         if(out[i].rfind("P", 0) == 0) {//Player Strategies
             regex playerDelim(" ");
-            vector<string> playerStrategies(sregex_token_iterator(out[i].begin(), out[i].end(), playerDelim, -1), sregex_token_iterator());
+            vector<string> playerStrategiess(sregex_token_iterator(out[i].begin(), out[i].end(), playerDelim, -1), sregex_token_iterator());
+            //Check if strategies are valid
+            for(string strategy : playerStrategiess) {
+                if(strategy != "P") {
+                    playerStrategies.push_back(strategy);
+                }
+            }
         }
         if(out[i].rfind("G", 0) == 0) {//Number of Games
             numOfGames = stoi(out[i].substr(2, out[i].length()));
@@ -328,21 +342,25 @@ void GameEngine::tournamentMode(std::string command) {
             maxNumOfTurns = stoi(out[i].substr(2, out[i].length()));
         }
     }
+    cout << "Tournament Loop being called" << endl;
     tournamentLoop(mapFiles, playerStrategies, numOfGames, maxNumOfTurns);
 }
 
 void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerStrategies, int numOfGames, int maxNumOfRounds) {
+    cout << "In Tournament Loop" << endl;
     string report[mapFiles.size()+1][numOfGames+1];
     //Prep report:
     report[0][0] = "";
     int curMapNum = 1;
     for(string mapF : mapFiles) { //Loop through every map file given
+        cout << "Now looping through: " << mapF << endl;
         report[curMapNum][0] = mapF;
         MapLoader mapLoader;
-        Map* map = mapLoader.loadMap(mapF+".map");
+        Map* map = mapLoader.loadMap(mapF);
         vector<Player *> players;
         int pId = 1;
         for(string playerStrat : playerStrategies) { //Create each player with the appropriate strategy
+            cout << "Creating a player with: " << playerStrat << endl;
             Player* player = new Player(playerStrat);
             player->setpID(pId);
             if(playerStrat == "Aggressive") { //Not implemented yet
@@ -371,7 +389,8 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
 
         //For every game we give them new territories
         for(int curGame = 1; curGame < numOfGames+1; curGame++) {
-            report[0][curGame] = "Game " + curGame;
+            report[0][curGame] = "Game " + to_string(curGame);
+            cout << "Currently running game " << curGame << endl;
             // a) fairly distribute all the territories to the players
             while(copiedTerritories.size() != 0){
                 for(auto it = players.begin(); it != players.end(); ++it){
@@ -406,6 +425,7 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
             int round = 1;
             srand(time(NULL));
             bool winner = false;
+            cout << "Now undergoing rounds" << endl;
             while(round < maxNumOfRounds+1) {
                 cout << "------ Tournament Game " << curGame << " | Round: " << round << " ------" << endl;
                 reinforcementPhase(map->territories, players);
@@ -425,6 +445,7 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
                     }
                 }
             }
+            exit(0);
             if(winner == false) {//No one won and we ran out of rounds thus draw
                 report[curMapNum][curGame] = "Draw";
             }
