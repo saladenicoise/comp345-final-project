@@ -311,6 +311,7 @@ void GameEngine::tournamentMode(std::string command) {
     cout << "In Tournament Mode" << endl;
     vector<string> mapFiles;
     vector<string> playerStrategies;
+    MapLoader mapLoader;
     int numOfGames = 0;
     int maxNumOfTurns = 0;
     regex delim("\\-");
@@ -320,7 +321,7 @@ void GameEngine::tournamentMode(std::string command) {
             regex mapDelim(" ");
             vector<string> mapFiless(sregex_token_iterator(out[i].begin(), out[i].end(), mapDelim, -1), sregex_token_iterator());
             for(string mapF : mapFiless) {
-                if(mapF != "M") {
+                if(mapF != "M" && mapLoader.loadMap(mapF)->validate()) {
                     mapFiles.push_back(mapF);
                 }
             }
@@ -363,6 +364,7 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
             cout << "Creating a player with: " << playerStrat << endl;
             Player* player = new Player(playerStrat);
             player->setpID(pId);
+            pId++;
             if(playerStrat == "Aggressive") { //Not implemented yet
                 //player->setStrategy(new AggresivePlayerStrategy());
                 //player->setStrategyString("Aggressive")
@@ -431,6 +433,7 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
                 reinforcementPhase(map->territories, players);
                 issueOrderPhase(players, this, deck);
                 executeOrderPhase(players);
+                //Check if someone won
                 for(int f = 0; f < players.size(); f++) {
                     if(players[f]->defendList.size() == 0) {
                         cout << "Player " << players[f]->getPID() << " has been eliminated" << endl;
@@ -444,11 +447,12 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
                         break;
                     }
                 }
+                round++;
             }
-            exit(0);
             if(winner == false) {//No one won and we ran out of rounds thus draw
                 report[curMapNum][curGame] = "Draw";
             }
+            cout << "Game Ended in a Draw!" << endl;
         }
     }
 }
