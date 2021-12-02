@@ -477,3 +477,58 @@ CheaterPlayerStrategy &CheaterPlayerStrategy::operator=(const CheaterPlayerStrat
     }
     return *this;
 }
+
+//AggressivePlayerStrategy class
+AggressivePlayerStrategy::AggressivePlayerStrategy() {
+    setStrategyName("Aggressive");
+}
+
+AggressivePlayerStrategy::~AggressivePlayerStrategy() {
+
+}
+
+vector<Territory*> AggressivePlayerStrategy::toDefend(vector<Territory*> Map, Player& player) {
+    vector<Territory*> toDefendTerritory = player.getTerritories();
+    cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be defended:" << endl;
+    for (int i = 0; i < Map.size(); i++)
+    {
+        player.getDefendList().push_back(toDefendTerritory[i]);
+        cout << *toDefendTerritory[i] << endl;
+
+    }
+    player.setDefendList(toDefendTerritory);
+    return player.getDefendList();
+}
+
+vector<Territory*> AggressivePlayerStrategy::toAttack(vector<Territory*> Map, Player &player) {
+    vector<Territory*> toAttackTerritory = player.getNeighbour(Map);
+    cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be attacked:" << endl;
+    for (int i = 0; i < toAttackTerritory.size(); i++)
+    {
+        player.getAttackList().push_back(toAttackTerritory[i]);
+        cout << *toAttackTerritory[i] << endl;
+    }
+    player.setAttackList(toAttackTerritory);
+    return player.getAttackList();
+}
+
+void AggressivePlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck *deck) {
+
+}
+
+
+AggressivePlayerStrategy::AggressivePlayerStrategy(const AggressivePlayerStrategy &strategy) {
+    this->setStrategyName(strategy.getStrategyName());
+}
+
+std::ostream &operator<<(ostream &out, const AggressivePlayerStrategy &strategy) {
+    return out << strategy.getStrategyName();
+}
+
+AggressivePlayerStrategy &AggressivePlayerStrategy::operator=(const AggressivePlayerStrategy &strategy) {
+    if(this != &strategy)
+    {
+        this->setStrategyName(strategy.getStrategyName());
+    }
+    return *this;
+}
