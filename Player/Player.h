@@ -52,7 +52,7 @@ class Player //this is the Player class
         int getGetCard();
         vector<Territory*> getNeighbour(vector<Territory*>);
         void issuingOrder(Player* p, GameEngine *game, Deck* deck);
-        void issueOrderObject(const Order); //creates an order object and adds it to the list of orders. 
+        void issueOrderObject(Order* order); //creates an order object and adds it to the list of orders. 
         int getOrderSize(int size); //returns order list object
         void selectOrder(Player *p, vector<Player*> targetPlayer, Deck* deck);
         vector<Territory*> getTerritories();

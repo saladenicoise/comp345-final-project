@@ -112,7 +112,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
             p->setReinforcementPool(p->getReinforcementPool()-numtoDeploy);
             Deploy *deploy;
             deploy = new Deploy(p,p->getDefendList()[numTerritory],numtoDeploy);
-            p->issueOrderObject(*deploy);
+            p->issueOrderObject(deploy);
             cout<<"ReinforcementPool:"<<p->getReinforcementPool()<<endl;
             tempReinforcementPool = p->getReinforcementPool();
         }
@@ -152,7 +152,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                     cout<<"How many armies do you want to airlift (choose between 1-" << p->getDefendList()[source]->armyCount << ")?: ";
                     cin>>army;
                     Airlift *airlift = new Airlift(p,p->getDefendList()[source],p->getDefendList()[target],army);
-                    p->issueOrderObject(*airlift);
+                    p->issueOrderObject(airlift);
                 }
             	if (card=="bomb")
             	{
@@ -176,7 +176,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                     int numTerritory;
                     cin>>numTerritory;
                     Bomb *bomb = new Bomb(p,bombTerritories[numTerritory]);
-                    p->issueOrderObject(*bomb);
+                    p->issueOrderObject(bomb);
             	}
                 if (card=="blockade")
             	{
@@ -199,7 +199,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                         }
                     }
                     Blockade *blockade = new Blockade(p,p->getDefendList()[numTerritory],neutralPlayer);
-                    p->issueOrderObject(*blockade);
+                    p->issueOrderObject(blockade);
             	}
                 if (card=="diplomacy")
                 {
@@ -213,7 +213,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                     cin>>target;
                     p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand());
                     Negotiate *negotiate = new Negotiate(p,players[target]);
-                    p->issueOrderObject(*negotiate);
+                    p->issueOrderObject(negotiate);
             	}
                 if (card=="reinforcement")
                 {
@@ -263,7 +263,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
             cout<<"How many armies do you want to advance (choose between 1-" << p->getDefendList()[source]->armyCount << ")?: ";
             cin>>army;
             Advance *advance = new Advance(p,targetP,p->getDefendList()[source],neighbours[target],army);
-            p->issueOrderObject(*advance);
+            p->issueOrderObject(advance);
         }
     }
 }
@@ -331,7 +331,7 @@ void BenevolentPlayerStrategy::issueOrder(Player* p, GameEngine *game, Deck* dec
         }
     }
     Deploy *deploy = new Deploy(p,p->getDefendList()[index],p->getReinforcementPool());
-    p->issueOrderObject(*deploy);
+    p->issueOrderObject(deploy);
 
     int minIndex = 0;
     for (int i=0; i<p->getDefendList().size(); i++)
@@ -364,7 +364,7 @@ void BenevolentPlayerStrategy::issueOrder(Player* p, GameEngine *game, Deck* dec
     {
         int army = neighbour[maxIndexNeighbour]->armyCount/2;
         Advance *advance = new Advance(p,p,neighbour[maxIndexNeighbour],p->getDefendList()[minIndex],army);
-        p->issueOrderObject(*advance);
+        p->issueOrderObject(advance);
     }
 }
 

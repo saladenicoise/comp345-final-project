@@ -225,10 +225,10 @@ vector<Territory*> Player::toDefend(vector<Territory*> Map, Player& p)
     return this->strategy->toDefend(Map,p);
 }
 
-void Player::issueOrderObject(const Order) //creates an order object and adds it to the list of orders. 
+void Player::issueOrderObject(Order* order) //creates an order object and adds it to the list of orders. 
 {
-    Order *newOrder = new Order();
-    this->olst->addOrder(newOrder);
+    // Order *newOrder = new Order();
+    this->olst->addOrder(order);
 }
 
 void Player::issuingOrder(Player* p, GameEngine *game, Deck* deck)
