@@ -115,3 +115,23 @@ class CheaterPlayerStrategy : public PlayerStrategy {
     // Assignment Operator
     CheaterPlayerStrategy& operator =(const CheaterPlayerStrategy& strategy);
 };
+
+class AggressivePlayerStrategy : public PlayerStrategy {
+public:
+    AggressivePlayerStrategy(); // Default constructor
+
+    AggressivePlayerStrategy(const AggressivePlayerStrategy& strategy); // Copy constructor
+    ~AggressivePlayerStrategy(); // Destructor
+
+    // Strategy Methods inherited
+    vector<Territory*> toDefend(vector<Territory*> Map, Player &player);
+    vector<Territory*> toAttack(vector<Territory*> Map, Player &player);
+    void issueOrder(Player *p, GameEngine *game, Deck* deck);
+
+
+    // Stream insertion operator
+    friend std::ostream& operator<<(std::ostream& os, const AggressivePlayerStrategy& strategy);
+
+    // Assignment Operator
+    AggressivePlayerStrategy& operator =(const AggressivePlayerStrategy& strategy);
+};
