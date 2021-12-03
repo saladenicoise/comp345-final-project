@@ -90,7 +90,9 @@ public:
     std::string getCommandsFileName();
 
     vector<Player*> getPlayersList();
-
+    // setter function for game players
+    void setPlayersList(vector<Player*>);
+    
     // setter function for attribute state declaration
     void setState(std::string state);
 
