@@ -55,6 +55,7 @@ int main() {
         deck->draw(player3->getHand());
     }
     GameEngine g("console");
+    g.setPlayersList(players);
     g.mainGameLoop(map->territories,players,deck, map->territories.size(), &g);
 
 
