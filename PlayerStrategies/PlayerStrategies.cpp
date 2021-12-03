@@ -403,6 +403,12 @@ vector<Territory*> NeutralPlayerStrategy::toAttack(vector<Territory*> Map, Playe
 }
 
 void NeutralPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck) {
+    // Distribute neutral players armies evenly among all of its territories
+    int distributeArmies = p->getReinforcementPool()/p->getDefendList().size();
+    for(int i = 0; i< p->getDefendList().size(); i++){
+        p->getDefendList()[i]->armyCount += distributeArmies;
+        p->setReinforcementPool(p->getReinforcementPool()-distributeArmies);
+    }
     cout << "NeutralPlayerStrategy issueOrder, Ending turn.\n" << endl;
 }
 
