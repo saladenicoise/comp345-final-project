@@ -404,9 +404,9 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
             Player* player = new Player(playerStrat);
             player->setpID(pId);
             pId++;
-            if(playerStrat == "Aggressive") { //Not implemented yet
-                //player->setStrategy(new AggresivePlayerStrategy());
-                //player->setStrategyString("Aggressive")
+            if(playerStrat == "Aggressive") {
+                player->setStrategy(new AggressivePlayerStrategy());
+                player->setStrategyString("Aggressive");
             }
             if(playerStrat == "Benevolent") {
                 player->setStrategy(new BenevolentPlayerStrategy());
