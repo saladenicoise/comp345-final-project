@@ -723,6 +723,7 @@ void GameEngine::executeOrderPhase(vector<Player*> player)
         for (int j=0; j<player[i]->getOrderList()->getSize(); j++)
         {    
             currentOrder = player[i]->getOrderList()->getIndex(j);
+            cout << "Attempting to execute: " << currentOrder->getOrderType() << endl;
             currentOrder->execute();
         }
         player[i]->olst->deleteAllOrder();     //deletes order list of each player for next turn

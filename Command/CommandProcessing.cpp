@@ -113,7 +113,7 @@ bool CommandProcessor::checkIfValidTourneyCommand(string command) {
             for(string strategy : playerStrategiess) {
                 if(strategy != "P") {
                     if (!(strategy == "Aggressive" || strategy == "Benevolent" || strategy == "Neutral" || strategy == "Cheater")) {//Not valid strategy
-                        cout << strategy << " is not a valid strategy type only: Aggresive, Benevolent, Neutral, or Cheater are accepted." << endl;
+                        cout << strategy << " is not a valid strategy type only: Aggressive, Benevolent, Neutral, or Cheater are accepted." << endl;
                         return false;
                     }
                     playerStrategies.push_back(strategy);

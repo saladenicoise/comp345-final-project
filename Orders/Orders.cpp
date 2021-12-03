@@ -393,6 +393,9 @@ bool Advance::validate() {
         return false;
     }
     //Make sure territories are adjacent
+    if(sourceTerritory == nullptr || destTerritory == nullptr) {
+        return false;
+    }
     for(int i = 0; i < sourceTerritory->edges.size(); i++) {
         if(sourceTerritory->edges[i] == destTerritory) {
             adjacent = true;
@@ -400,7 +403,7 @@ bool Advance::validate() {
         }
     }
     //Are the source and destination not null AND is the number of units less than or = to armies in territory AND are the territories adjacent
-    if((sourceTerritory != nullptr || destTerritory != nullptr) && (numOfUnits <= sourceTerritory->armyCount) && adjacent && attackable) {
+    if((numOfUnits <= sourceTerritory->armyCount) && adjacent && attackable) {
         return true;
     }else{
         return false;
