@@ -9,7 +9,7 @@ int main() {
 
     vector <Territory*> p1;
     p1.push_back(map->territories[0]);
-    p1.push_back(map->territories[1]);
+    p1.push_back(map->territories[2]);
   
     vector <Territory*> p2;
     
@@ -17,26 +17,30 @@ int main() {
     p2.push_back(map->territories[5]);
 
     vector <Territory*> p3;
-    p3.push_back(map->territories[2]);
+    p3.push_back(map->territories[1]);
     p3.push_back(map->territories[3]);
 
     Player* player = new Player(name);
     Player* player2 = new Player("Tom");
     Player* player3 = new Player("Tim");
+    
     player->setpID(1);
     player2->setpID(2);
     player3->setpID(3);
+    
     player->setReinforcementPool(50);
     player2->setReinforcementPool(50);
     player3->setReinforcementPool(50);
+    
     player->setTerritories(p1);
     player2->setTerritories(p2);
     player3->setTerritories(p3);
+    
     vector <Player*> players = {player, player2, player3};
     
-    player->setStrategy(new HumanPlayerStrategy());
+    player->setStrategy(new CheaterPlayerStrategy());
     player2->setStrategy(new BenevolentPlayerStrategy());
-    player3->setStrategy(new HumanPlayerStrategy());
+    player3->setStrategy(new NeutralPlayerStrategy());
 
     player->toDefend(p1,*player);
     player->toAttack(p1,*player);
