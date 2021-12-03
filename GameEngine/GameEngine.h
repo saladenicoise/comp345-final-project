@@ -109,6 +109,14 @@ public:
     bool fileExist (const std::string& name);
 
     std::string stringToLog();
+    string report[6][6];
+    string mapList;
+    string playerList;
+    int numOfGamesToPrint;
+    int maxRoundsToPrint;
+    int biggestMapNameSize = 0;
+    int biggestStrategyNameSize = 0;
+    bool skipTourneyCommandInput = false;
 
     void reinforcementPhase(vector<Territory*> map, vector<Player*> players);
     void issueOrderPhase(vector<Player*> player,GameEngine *game, Deck* deck);

@@ -233,6 +233,7 @@ void Player::issueOrderObject(Order* order) //creates an order object and adds i
 
 void Player::issuingOrder(Player* p, GameEngine *game, Deck* deck)
 {
+    //cout << "Issuing Order for " << p->getPID() << endl;
     return this->strategy->issueOrder(p,game, deck);
 }
 

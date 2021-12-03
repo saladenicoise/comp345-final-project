@@ -145,8 +145,8 @@ bool CommandProcessor::checkIfValidTourneyCommand(string command) {
 }
 
 bool CommandProcessor::checkIfValidCommand(string command) {
-    if (command == "tournament" || command == "start" || command == "loadmap" || command == "validatemap" || command == "addplayer"
-        || command == "gamestart" || command=="tourneystart" || command == "replay" || command == "quit") {
+    if (command.substr(0, 10) == "tournament" || command == "start" || command == "loadmap" || command == "validatemap" || command == "addplayer"
+        || command == "gamestart" || command=="tourneystart" || command=="endtourney" || command == "replay" || command == "quit" || command == "tourney") {
 
         return true;
     }

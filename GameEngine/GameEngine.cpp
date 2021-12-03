@@ -10,13 +10,14 @@ GameEngine::GameEngine(string mode) {
     state = new std::string("pregame");
     nextValidCommands = new std::vector<std::string>;
     nextValidCommands->push_back("start");
-    nextValidCommands->push_back("tournament");
+    nextValidCommands->push_back("tourney");
     ordersToExecute = new std::vector<std::string>;
     commandProcessor = new CommandProcessor();
     if(mode == "console") {
        commandProcessor = new CommandProcessor();
     } else {
         FileLineReader *flr = new FileLineReader(mode);
+        skipTourneyCommandInput = true;
         commandProcessor = new FileCommandProcessorAdapter(*flr);
     }
 }
@@ -101,6 +102,14 @@ void GameEngine::doTransition(std::string command) {
      ****************************/
 
 
+    if(command == "endtourney") {
+        oldState = *state;
+        setState("TourneyEnd");
+        displayTransition(oldState, state, command);
+        nextValidCommands->clear();
+        ordersToExecute->clear();
+        nextValidCommands->push_back("quit");
+    }
     if(command == "replay") {
         oldState = *state;
         setState("Win");
@@ -115,6 +124,7 @@ void GameEngine::doTransition(std::string command) {
         nextValidCommands->clear();
         ordersToExecute->clear();
         std::cout << "Thanks for playing Warzone." << std::endl;
+        exit(0);
     }
 
 }
@@ -123,24 +133,36 @@ void GameEngine::startupPhase(std::string command) {
     bool valid = false;
     std::string oldState;
     std::string transitionString;
-    if (command == "tournament") {//Does it start with tournament
+    if(command == "tourney") {
+        oldState = *state;
+        setState("tourney");
+        transitionString = displayTransition(oldState, state, command);
+        commandProcessor->commands.back()->saveEffect(transitionString);
+        nextValidCommands->clear();
+        nextValidCommands->push_back("tournament");
+    }else if(command.substr(0, 10) == "tournament" && !skipTourneyCommandInput) {//User Input Required
+            oldState = *state;
+            setState("tournament");
+            transitionString = displayTransition(oldState, state, command);
+            commandProcessor->commands.back()->saveEffect(transitionString);
+            while (!valid) {
+                cout << "Enter Tournament Command: ";
+                getline(cin, tournamentCommand);
+                if(commandProcessor->checkIfValidTourneyCommand(tournamentCommand)) {
+                    valid = true;
+                    nextValidCommands->push_back("tourneystart");
+                } else {
+                    cout << "Invalid tournament command, try again" << endl;
+                }
+            }
+    }else if(command == "tournament" && !tournamentCommand.empty()) {//Is tournament command empty? if no, that means it was validated when read from the file
         oldState = *state;
         setState("tournament");
         transitionString = displayTransition(oldState, state, command);
         commandProcessor->commands.back()->saveEffect(transitionString);
         nextValidCommands->clear();
-        while (!valid) {
-            cout << "Enter Tournament Command: ";
-            getline(cin, tournamentCommand);
-            if(commandProcessor->checkIfValidTourneyCommand(tournamentCommand)) {
-                valid = true;
-                nextValidCommands->push_back("tourneystart");
-            } else {
-                cout << "Invalid tournament command, try again" << endl;
-            }
-        }
+        nextValidCommands->push_back("tourneystart");
     }
-
     // Declare variables
     load_map = new MapLoader();
     deck = new Deck(30);
@@ -225,7 +247,6 @@ void GameEngine::startupPhase(std::string command) {
         }        
 
     }else if (command == "tourneystart"){
-        cout << "Tournament Command Start: " << tournamentCommand << endl;
         oldState = *state;
         setState("tourneystart");
         transitionString = displayTransition(oldState, state, command);
@@ -322,7 +343,11 @@ void GameEngine::tournamentMode(std::string command) {
             vector<string> mapFiless(sregex_token_iterator(out[i].begin(), out[i].end(), mapDelim, -1), sregex_token_iterator());
             for(string mapF : mapFiless) {
                 if(mapF != "M" && mapLoader.loadMap(mapF)->validate()) {
+                    if(mapF.size() > biggestMapNameSize) {
+                        biggestMapNameSize = mapF.size();
+                    }
                     mapFiles.push_back(mapF);
+                    mapList += mapF + " ";
                 }
             }
         }
@@ -332,15 +357,22 @@ void GameEngine::tournamentMode(std::string command) {
             //Check if strategies are valid
             for(string strategy : playerStrategiess) {
                 if(strategy != "P") {
+                    if(strategy.size() > biggestStrategyNameSize) {
+                        biggestStrategyNameSize = strategy.size();
+                    }
                     playerStrategies.push_back(strategy);
+                    playerList += strategy + " ";
                 }
             }
+
         }
         if(out[i].rfind("G", 0) == 0) {//Number of Games
             numOfGames = stoi(out[i].substr(2, out[i].length()));
+            numOfGamesToPrint = numOfGames;
         }
         if(out[i].rfind("D", 0) == 0) {//Number of turns
             maxNumOfTurns = stoi(out[i].substr(2, out[i].length()));
+            maxRoundsToPrint = maxNumOfTurns;
         }
     }
     cout << "Tournament Loop being called" << endl;
@@ -348,17 +380,24 @@ void GameEngine::tournamentMode(std::string command) {
 }
 
 void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerStrategies, int numOfGames, int maxNumOfRounds) {
-    cout << "In Tournament Loop" << endl;
-    string report[mapFiles.size()+1][numOfGames+1];
+    string oldState;
+    string transitionString;
+    oldState = *state;
+    setState("intourney");
+    transitionString = displayTransition(oldState, state, "tourneystart");
+    commandProcessor->commands.back()->saveEffect(transitionString);
+    nextValidCommands->clear();
+    nextValidCommands->push_back("endtourney");
     //Prep report:
-    report[0][0] = "";
+    for(int space=0; space < biggestMapNameSize; space++) {
+        report[0][0] += " ";
+    }
     int curMapNum = 1;
     for(string mapF : mapFiles) { //Loop through every map file given
         cout << "Now looping through: " << mapF << endl;
         report[curMapNum][0] = mapF;
         MapLoader mapLoader;
-        Map* map = mapLoader.loadMap(mapF);
-        vector<Player *> players;
+        Map* mapL = mapLoader.loadMap(mapF);
         int pId = 1;
         for(string playerStrat : playerStrategies) { //Create each player with the appropriate strategy
             cout << "Creating a player with: " << playerStrat << endl;
@@ -381,12 +420,12 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
                 player->setStrategy(new CheaterPlayerStrategy());
                 player->setStrategyString("Cheater");
             }
-            players.push_back(player);
+            this->players.push_back(player);
         }
         // Make copy of the territories
-        vector<Territory*> copiedTerritories(map->territories.size());
-        for(int i = 0; i < map->territories.size(); i++){
-            copiedTerritories[i] = map->territories[i];
+        vector<Territory*> copiedTerritories(mapL->territories.size());
+        for(int i = 0; i < mapL->territories.size(); i++){
+            copiedTerritories[i] = mapL->territories[i];
         }
 
         //For every game we give them new territories
@@ -408,6 +447,12 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
                 }
             }
 
+            //Assign their attack/defend lists
+            for(auto p : players){
+                p->toDefend(p->getDefendList(),*p);
+                p->toAttack(p->getAttackList(),*p);
+            }
+
             // Display players' territories and reinforcement pool
             for(auto it = players.begin(); it != players.end(); ++it){
                 // c) give 50 initial armies to the players, which are placed in their respective reinforcement pool
@@ -422,26 +467,25 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
             unsigned seed = std::chrono::system_clock::now()
                     .time_since_epoch()
                     .count();
-            std::shuffle(std::begin(players), std::end(players), std::default_random_engine());
+            std::shuffle(std::begin(players), std::end(players), std::default_random_engine(seed));
 
             int round = 1;
-            srand(time(NULL));
             bool winner = false;
             cout << "Now undergoing rounds" << endl;
-            while(round < maxNumOfRounds+1) {
+            while(round < maxNumOfRounds+1 && !winner) {
                 cout << "------ Tournament Game " << curGame << " | Round: " << round << " ------" << endl;
-                reinforcementPhase(map->territories, players);
+                reinforcementPhase(mapL->territories, players);
                 issueOrderPhase(players, this, deck);
                 executeOrderPhase(players);
                 //Check if someone won
                 for(int f = 0; f < players.size(); f++) {
-                    if(players[f]->defendList.size() == 0) {
+                    if(players[f]->defendList.empty()) {
                         cout << "Player " << players[f]->getPID() << " has been eliminated" << endl;
                         delete players[f];
                         players[f] = nullptr; //Avoid dangling pointers
                     }
-                    if(players[f]->getTerritories().size() == map->territories.size()) {
-                        cout << "Game " << curGame << " has been won by " << players[f] << endl;
+                    if(players[f]->getTerritories().size() == mapL->territories.size()) {
+                        cout << "Game " << curGame << " has been won by Player " << players[f]->getPID() << " who was the " << players[f]->getPlayerStrategyString() <<endl;
                         report[curMapNum][curGame] = players[f]->getPlayerStrategyString();
                         winner = true;
                         break;
@@ -450,12 +494,11 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
                 round++;
             }
             if(winner == false) {//No one won and we ran out of rounds thus draw
+                cout << "Game Ended in a Draw!" << endl;
                 report[curMapNum][curGame] = "Draw";
             }
-            cout << "Game Ended in a Draw!" << endl;
         }
     }
-    setState("tourneyend");
 }
 
 // Defining the support function responsible for displaying the current transition taking place
@@ -483,12 +526,22 @@ void GameEngine::takeOrder() {
 
 // Defining the function that encapsulates the inner working of all the transition functions
 void GameEngine::transition() {
-
+    bool tournament = false;
+    bool valid = false;
     commandProcessor->getCommand();
-   
     string command = commandProcessor->commands.back()->getCommand();
     string delimiter = " ";
-    
+
+    if(command.substr(0, 10) == "tournament" && command.length() > 10) {
+        tournament = true;
+        if(commandProcessor->checkIfValidTourneyCommand(command)) {
+            tournamentCommand = command;
+            valid = true;
+        }else{
+            std::cout << "Tournament Command Invalid, now exiting" << endl;
+            exit(0);
+        }
+    }
     if(command.find(' ') != std::string::npos) {
         string token = command.substr(command.find(delimiter)).erase(0,delimiter.length());;
         command = command.substr(0,command.find(delimiter));
@@ -500,10 +553,10 @@ void GameEngine::transition() {
         }
         
     }
-    bool valid = commandProcessor->checkIfValidCommand(command);
+    if(!tournament)
+        valid = commandProcessor->checkIfValidCommand(command);
 
     if(valid) {
-
         if(validTransition(command)) {
             doTransition(command);
             notify(this);
@@ -512,7 +565,6 @@ void GameEngine::transition() {
             std::cout << commandProcessor->commands.back()->getEffect() << std::endl;
             
         }
-
     } else {
         commandProcessor->commands.back()->saveEffect("Command entered is not valid. State remains unchanged.");
         std::cout << commandProcessor->commands.back()->getEffect() << std::endl;
@@ -558,6 +610,32 @@ bool GameEngine::fileExist (const std::string& name) {
 }
 
 std::string GameEngine::stringToLog() {
+    if(this->getState() == "TourneyEnd") {
+        string toRet = "Tournament Mode: \nM: " + mapList + "\nP: " + playerList + "\nG: " + to_string(numOfGamesToPrint) + "\nD: " + to_string(maxRoundsToPrint) + "\nResults:\n";
+        for(int i=0; i < 6; i++) {//Rows
+            if(report[i][0].empty()) {//Is the current row empty at the first entry? yes, we are done printing our report
+                break;
+            }
+            for(int j=0; j < 6; j++) {//Cols
+                if(report[i][j].empty()) {
+                    toRet += "\n";
+                    break;
+                }else{
+                    if(i == 0 && j > 0) {//First row, Second+ Column
+                        toRet += report[i][j];
+                        int diff = biggestStrategyNameSize-report[i][j].length()-2;
+                        for(int v = 0; v < diff; v++) {
+                            toRet += " ";
+                        }
+                        toRet += " | ";
+                    }else{
+                        toRet += report[i][j] + " | ";
+                    }
+                }
+            }
+        }
+        return toRet;
+    }
     return "Current State is now: " + this->getState();
 }
 
@@ -618,9 +696,8 @@ void GameEngine::issueOrderPhase(vector<Player*> player,GameEngine *game, Deck* 
 {
     for (int i=0; i<player.size(); i++)
     {
-        player[i]->issuingOrder(player[i],game, deck);
+        player[i]->issuingOrder(player[i], game, deck);
     }
-
 }
 void GameEngine::executeOrderPhase(vector<Player*> player)
 {    
@@ -635,7 +712,7 @@ void GameEngine::executeOrderPhase(vector<Player*> player)
             currentOrder = player[i]->getOrderList()->getIndex(j);
             currentOrder->execute();
         }
-        player[i]->olst->deleteAllOrder();     //deletes order list of each player for next turn 
+        player[i]->olst->deleteAllOrder();     //deletes order list of each player for next turn
     }
 }
 

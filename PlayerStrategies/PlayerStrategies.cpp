@@ -459,41 +459,32 @@ vector<Territory*> CheaterPlayerStrategy::toAttack(vector<Territory*> Map, Playe
 void CheaterPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck) {
         vector<Territory*> enemyNeigh = p->getAttackList();
         for(int k = 0;k < enemyNeigh.size();k++){
-        //Change Ownership
-        p->getAttackList()[k]->setOwnerId(p->getPID());
-        
-        //Remove from loser's list
-        vector<Territory *> loserTer;
-        vector<Territory *> newTer;
-        for(int i = 0; i < p->getTerritories().size(); i++) {
-            if(p->getTerritories()[i]->getPlayerIDOccupying() == p->getTerritories()[k]->getPlayerIDOccupying()) {
-                loserTer.push_back(p->getAttackList()[k]);
-            }
-        }
-
-        for(int i = 0; i < loserTer.size(); i++) {
-            if(loserTer[i] != p->getAttackList()[k]) {
-                newTer.push_back(loserTer[i]);
-            }
-        }
-        // set new territory vector for target player
-        for(int i = 0; i < p->getTerritories().size(); i++) {
-            if(p->getTerritories()[i]->getPlayerIDOccupying() == p->getTerritories()[k]->getPlayerIDOccupying()) {
-                newTer.push_back(p->getAttackList()[k]);
-                if(p->getTerritories().size()-1== i){
-                    for(int j = 0;j<newTer.size();j++){
-                         p->getTerritories()[i]->edges.push_back(newTer[j]);
-                    }
+            vector<Player*> players = game->getPlayersList();
+            Player* targetPlayer;
+            Territory* attackTarget = p->getAttackList()[k];
+            for(int i = 0; i < players.size(); i++) {//Find the player that owns the territory we are currently stealing
+                if(players[i]->getPID() == attackTarget->getPlayerIDOccupying()) {
+                    targetPlayer = players[i];
                 }
             }
+            //Give it to the cheater (sourcePlayer or p)
+            attackTarget->setOwnerId(p->getPID());
+            //Remove from loser's list
+            vector<Territory *> loserTer = targetPlayer->getTerritories();
+            vector<Territory *> newTer;
+            for(int i = 0; i < loserTer.size(); i++) {
+                if(loserTer[i] != attackTarget) {//Is the territory of the target player the one we just stole?
+                    newTer.push_back(loserTer[i]); //Add  it to the list of new territories
+                }
+            }
+            targetPlayer->setTerritories(newTer);
+            //Add to winner's list
+            vector<Territory *> winnerTer = p->getTerritories();
+            winnerTer.push_back(attackTarget);
+            p->setTerritories(winnerTer);
+            p->setGetCard(1);
         }
-        //Add to winner's list
-        vector<Territory *> winnerTer = p->getTerritories();
-        winnerTer.push_back(p->getAttackList()[k]);
-        p->setTerritories(winnerTer);
-
-        }
-        p->issueOrder("cheater is taking neighbours!");
+        cout << "Cheater has taken control of its neighbors" << endl;
 }
 
 CheaterPlayerStrategy::CheaterPlayerStrategy(const CheaterPlayerStrategy &strategy) {
