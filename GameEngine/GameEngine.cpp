@@ -720,6 +720,10 @@ vector<Player*> GameEngine::getPlayersList(){ // get players
 	return players;
 }
 
+void GameEngine::setPlayersList(vector<Player*> newPlayersList){
+	players = newPlayersList;
+}
+
 void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, Deck* deck,int mapSize, GameEngine *game)
 {
     int count = 1;
@@ -737,7 +741,18 @@ void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, De
         issueOrderPhase(players,game,deck);
         executeOrderPhase(players);
         int i = 0;
-        
+         int randP = std::rand() % (1 + 1 - 0) + 0;
+
+        // if last two players are incapable of doing anything switch thier strategy
+        if(players.size() == 2){
+            players.shrink_to_fit();
+            if((players[0]->getPlayerStrategy()->getStrategyName() == "Neutral" && players[1]->getPlayerStrategy()->getStrategyName() == "Neutral")
+            ||(players[0]->getPlayerStrategy()->getStrategyName() == "Benevolent" && players[1]->getPlayerStrategy()->getStrategyName() == "Neutral")
+            ||(players[0]->getPlayerStrategy()->getStrategyName() == "Benevolent" && players[1]->getPlayerStrategy()->getStrategyName() == "Benevolent")) {
+                cout << "Switching " << players[randP]->getPID() <<" to cheater" << endl;
+                players[randP]->setStrategy(new CheaterPlayerStrategy()); // switch random person
+            }
+        }
         if (players[i]->defendList.size()==0) //if a player does not control any territories then the player is removed
         {
             delete players[i];
