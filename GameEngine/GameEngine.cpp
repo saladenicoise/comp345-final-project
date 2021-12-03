@@ -659,7 +659,7 @@ void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, De
         issueOrderPhase(players,game,deck);
         executeOrderPhase(players);
         int i = 0;
-        i++;
+        
         if (players[i]->defendList.size()==0) //if a player does not control any territories then the player is removed
         {
             delete players[i];
@@ -671,6 +671,7 @@ void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, De
             cout<<"Player " << players[i]->getPID() << " won" << endl;
             break;
         }
+	i++;
         count++;
     }
 }
