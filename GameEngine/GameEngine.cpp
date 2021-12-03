@@ -477,6 +477,19 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
                 reinforcementPhase(mapL->territories, players);
                 issueOrderPhase(players, this, deck);
                 executeOrderPhase(players);
+                
+                int randP = std::rand() % (1 + 1 - 0) + 0;
+
+                // if last two players are incapable of doing anything switch thier strategy
+                if(players.size() == 2){
+                    players.shrink_to_fit();
+                    if((players[0]->getPlayerStrategy()->getStrategyName() == "Neutral" && players[1]->getPlayerStrategy()->getStrategyName() == "Neutral")
+                       ||(players[0]->getPlayerStrategy()->getStrategyName() == "Benevolent" && players[1]->getPlayerStrategy()->getStrategyName() == "Neutral")
+                       ||(players[0]->getPlayerStrategy()->getStrategyName() == "Benevolent" && players[1]->getPlayerStrategy()->getStrategyName() == "Benevolent")) {
+                        cout << "Switching " << players[randP]->getPID() <<" to cheater" << endl;
+                        players[randP]->setStrategy(new CheaterPlayerStrategy()); // switch random person
+                    }
+                }
                 //Check if someone won
                 for(int f = 0; f < players.size(); f++) {
                     if(players[f]->defendList.empty()) {
