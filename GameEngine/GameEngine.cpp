@@ -455,6 +455,7 @@ void GameEngine::tournamentLoop(vector<string> mapFiles, vector<string> playerSt
             cout << "Game Ended in a Draw!" << endl;
         }
     }
+    setState("tourneyend");
 }
 
 // Defining the support function responsible for displaying the current transition taking place
