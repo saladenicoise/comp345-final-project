@@ -755,7 +755,7 @@ void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, De
         issueOrderPhase(players,game,deck);
         executeOrderPhase(players);
         int i = 0;
-         int randP = std::rand() % (1 + 1 - 0) + 0;
+        int randP = std::rand() % (1 + 1 - 0) + 0;
 
         // if last two players are incapable of doing anything switch thier strategy
         if(players.size() == 2){
@@ -765,6 +765,41 @@ void GameEngine::mainGameLoop(vector<Territory*> map,vector<Player*> players, De
             ||(players[0]->getPlayerStrategy()->getStrategyName() == "Benevolent" && players[1]->getPlayerStrategy()->getStrategyName() == "Benevolent")) {
                 cout << "Switching " << players[randP]->getPID() <<" to cheater" << endl;
                 players[randP]->setStrategy(new CheaterPlayerStrategy()); // switch random person
+            }
+        }
+	for(int j = 0;j<players.size();j++){
+            std::string change;
+            std::string playerStrat;
+            cout << "Switch player " <<  players[j]->getPID() << " to another strategy?, y or n" << endl;
+            cin>>change;
+            if(change == "y"){
+                cout << "Which strategy?" << endl;
+                cin>>playerStrat;
+                if(playerStrat == "Aggressive") {
+                    players[j]->setStrategy(new AggressivePlayerStrategy());
+                    players[j]->setStrategyString("Aggressive");
+                    cout << "Switching " << players[j]->getPID() <<" to aggressive" << endl;
+                }
+                if(playerStrat == "Benevolent") {
+                    players[j]->setStrategy(new BenevolentPlayerStrategy());
+                    players[j]->setStrategyString("Benevolent");
+                    cout << "Switching " << players[j]->getPID() <<" to benevolent" << endl;
+                }
+                if(playerStrat == "Neutral") {
+                    players[j]->setStrategy(new NeutralPlayerStrategy());
+                    players[j]->setStrategyString("Neutral");
+                    cout << "Switching " << players[j]->getPID() <<" to neutral" << endl;
+                }
+                if(playerStrat == "Cheater") {
+                    players[j]->setStrategy(new CheaterPlayerStrategy());
+                    players[j]->setStrategyString("Cheater");
+                    cout << "Switching " << players[j]->getPID() <<" to cheater" << endl;
+                }
+                if(playerStrat == "Human") {
+                    players[j]->setStrategy(new HumanPlayerStrategy());
+                    players[j]->setStrategyString("Human");
+                    cout << "Switching " << players[j]->getPID() <<" to human" << endl;
+                }
             }
         }
         if (players[i]->defendList.size()==0) //if a player does not control any territories then the player is removed
