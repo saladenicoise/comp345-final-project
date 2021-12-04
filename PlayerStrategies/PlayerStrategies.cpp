@@ -267,10 +267,10 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                     }
                 }
             }
-	    // Switch strategy if target is neutral
-            if(targetPlayer->getPlayerStrategy()->getStrategyName() == "Neutral"){
-                cout << "Neutral Player Attacked!\nSwitching Neutral Player: " << targetPlayer->getPID() <<" to cheater/aggressive" << endl;
-                targetPlayer->setStrategy(new CheaterPlayerStrategy());
+  		// Switch strategy if target is neutral
+            if(targetP->getPlayerStrategy()->getStrategyName() == "Neutral"){
+                cout << "Neutral Player Attacked!\nSwitching Neutral Player: " << targetP->getPID() <<" to cheater/aggressive" << endl;
+                targetP->setStrategy(new CheaterPlayerStrategy());
             }
             cout<<"How many armies do you want to advance (choose between 1-" << p->getDefendList()[source]->armyCount << ")?: ";
             cin>>army;
