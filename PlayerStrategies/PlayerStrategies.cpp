@@ -5,14 +5,17 @@
 #include <iostream>
 using std::cin;
 using std::cout;
+// Default constructor
 PlayerStrategy::PlayerStrategy() {
 
 }
 
+// Mutator
 void PlayerStrategy::setStrategyName(string name) {
     strategy_name = name;
 }
 
+//Assignment operator
 PlayerStrategy &PlayerStrategy::operator=(const PlayerStrategy &strategy) {
     if(this != &strategy)
     {
@@ -24,28 +27,29 @@ PlayerStrategy &PlayerStrategy::operator=(const PlayerStrategy &strategy) {
 PlayerStrategy::~PlayerStrategy() {
 
 }
-
+// output overload
 std::ostream &operator<<(ostream &os, const PlayerStrategy &strategy) {
     return os << strategy.strategy_name;
 }
-
+// accesor 
 string PlayerStrategy::getStrategyName() const {
     return strategy_name;
 }
-
+// copy constructor
 PlayerStrategy::PlayerStrategy(const PlayerStrategy &strategy) {
     this->setStrategyName(strategy.strategy_name);
 }
 
-//------
+//Human Class
 HumanPlayerStrategy::HumanPlayerStrategy() {
     setStrategyName("Human");
 }
 
+//Default constructor
 HumanPlayerStrategy::~HumanPlayerStrategy() {
 
 }
-
+// to defend method
 vector<Territory*> HumanPlayerStrategy::toDefend(vector<Territory*> Map, Player& player) {
     vector<Territory*> toDefendTerritory = player.getTerritories();
     cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be defended:" << endl;
@@ -59,6 +63,7 @@ vector<Territory*> HumanPlayerStrategy::toDefend(vector<Territory*> Map, Player&
 	return player.getDefendList();
 }
 
+// to attack method
 vector<Territory*> HumanPlayerStrategy::toAttack(vector<Territory*> Map, Player &player) {
 	vector<Territory*> toAttackTerritory = player.getNeighbour(Map);
 	cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be attacked:" << endl;
@@ -71,15 +76,17 @@ vector<Territory*> HumanPlayerStrategy::toAttack(vector<Territory*> Map, Player 
 	return player.getAttackList();
 }
 
-
+// copy constructor
 HumanPlayerStrategy::HumanPlayerStrategy(const HumanPlayerStrategy &strategy) {
     this->setStrategyName(strategy.getStrategyName());
 }
 
+// output overload
 std::ostream &operator<<(ostream &out, const HumanPlayerStrategy &strategy) {
     return out << strategy.getStrategyName();
 }
 
+// assignment overload
 HumanPlayerStrategy &HumanPlayerStrategy::operator=(const HumanPlayerStrategy &strategy) {
     if(this != &strategy)
     {
@@ -89,8 +96,8 @@ HumanPlayerStrategy &HumanPlayerStrategy::operator=(const HumanPlayerStrategy &s
 }
 
 void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
-    int initialReinforcementPool = p->getReinforcementPool();
-    vector<Player *> players = game->getPlayersList();
+    int initialReinforcementPool = p->getReinforcementPool(); // get players armies
+    vector<Player *> players = game->getPlayersList(); // get game players
 
     do
     {
@@ -100,13 +107,13 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
         int numtoDeploy;
         cin>>numtoDeploy;
         cout<<"Which territory do you want to deploy?: \n";
-        for (int i=0; i<p->getDefendList().size(); i++)
+        for (int i=0; i<p->getDefendList().size(); i++) // loop defense list
         {
-            cout<<i<<": "<<*p->getDefendList()[i]<<endl;
+            cout<<i<<": "<<*p->getDefendList()[i]<<endl; // show territories
         }
         int numTerritory;
         cin>>numTerritory;
-        if((numtoDeploy > 0) && (numtoDeploy <= p->getReinforcementPool()))
+        if((numtoDeploy > 0) && (numtoDeploy <= p->getReinforcementPool())) // deploy to terr
         {
             p->getDefendList()[numTerritory]->armyCount += numtoDeploy;
             p->setReinforcementPool(p->getReinforcementPool()-numtoDeploy);
@@ -116,7 +123,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
             cout<<"ReinforcementPool:"<<p->getReinforcementPool()<<endl;
             tempReinforcementPool = p->getReinforcementPool();
         }
-    }while(p->getReinforcementPool()!=0);
+    }while(p->getReinforcementPool()!=0); // loop if you have armies
 
     if (p->getReinforcementPool()==0)
     {
@@ -127,7 +134,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
         srand (time(NULL));
         if(p->getHand()->getHandSize()!=0) //if the player has cards then one of the cards is selected and the card's play() method is called
         {
-            cout<<"Do you want to issue an order from your cards? y/n: ";
+            cout<<"Do you want to issue an order from your cards? y/n: "; // play cards
             string answer;
             cin>>answer;
             if (answer=="y")
@@ -136,10 +143,10 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                 cout<<"Which card would you like to select?: ";
                 string card;
                 cin>>card;
-                if (card=="airlift")
+                if (card=="airlift") // airlift card played
                 {
-                    int index = p->getHand()->findCard(AIRLIFT);
-                    p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand());
+                    int index = p->getHand()->findCard(AIRLIFT); // find card in hand
+                    p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand()); // play card
                     for (int i=0; i<p->getDefendList().size(); i++)
                     {
                         cout<<i<<": "<<*p->getDefendList()[i]<<endl;
@@ -154,7 +161,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                     Airlift *airlift = new Airlift(p,p->getDefendList()[source],p->getDefendList()[target],army);
                     p->issueOrderObject(airlift);
                 }
-            	if (card=="bomb")
+            	if (card=="bomb") // bomb played
             	{
             	    vector<Territory*> bombTerritories;
                     int index = p->getHand()->findCard(BOMB);
@@ -178,7 +185,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                     Bomb *bomb = new Bomb(p,bombTerritories[numTerritory]);
                     p->issueOrderObject(bomb);
             	}
-                if (card=="blockade")
+                if (card=="blockade") // blockade played
             	{
             	    int index = p->getHand()->findCard(BLOCKADE);
                     p->getHand()->cardAtIndex(index).play(*p, *deck, *p->getHand());
@@ -201,7 +208,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                     Blockade *blockade = new Blockade(p,p->getDefendList()[numTerritory],neutralPlayer);
                     p->issueOrderObject(blockade);
             	}
-                if (card=="diplomacy")
+                if (card=="diplomacy") // negotiate
                 {
                     int index = p->getHand()->findCard(DIPLOMACY);
                     for (int i=0; i<players.size(); i++)
@@ -215,7 +222,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                     Negotiate *negotiate = new Negotiate(p,players[target]);
                     p->issueOrderObject(negotiate);
             	}
-                if (card=="reinforcement")
+                if (card=="reinforcement") // reinforce armies
                 {
                     int index = p->getHand()->findCard(REINFORCEMENT);
                     cout<<"Adding 5 reinforcement armies!\n";
@@ -224,7 +231,7 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
             	}
             }
         }
-        cout<<"Do you want to issue an advanced order? y/n: ";
+        cout<<"Do you want to issue an advanced order? y/n: "; // advance to a territory
         string answer;
         cin>>answer;
         if (answer=="y")
@@ -269,17 +276,17 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
 }
 
 //BenevolentPlayerStrategy class
-
+// default constructor
 BenevolentPlayerStrategy::BenevolentPlayerStrategy() {
-    setStrategyName("Aggressive");
+    setStrategyName("Benevolent");
 }
-
+// destructor
 BenevolentPlayerStrategy::~BenevolentPlayerStrategy() {
 
 }
-
+// to defend
 vector<Territory*> BenevolentPlayerStrategy::toDefend(vector<Territory*> Map, Player& player) {
-    vector<Territory*> toDefendTerritory = player.getTerritories();
+    vector<Territory*> toDefendTerritory = player.getTerritories(); // terr player owns
     cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be defended:" << endl;
 	for (int i = 0; i < Map.size(); i++)
 	{
@@ -291,8 +298,9 @@ vector<Territory*> BenevolentPlayerStrategy::toDefend(vector<Territory*> Map, Pl
 	return player.getDefendList();
 }
 
+// to attack
 vector<Territory*> BenevolentPlayerStrategy::toAttack(vector<Territory*> Map, Player &player) {
-	vector<Territory*> toAttackTerritory = player.getNeighbour(Map);
+	vector<Territory*> toAttackTerritory = player.getNeighbour(Map); // neighbors of player
 	cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be attacked:" << endl;
 	for (int i = 0; i < toAttackTerritory.size(); i++)
 	{
@@ -303,15 +311,15 @@ vector<Territory*> BenevolentPlayerStrategy::toAttack(vector<Territory*> Map, Pl
 	return player.getAttackList();
 }
 
-
+// copy constructor
 BenevolentPlayerStrategy::BenevolentPlayerStrategy(const BenevolentPlayerStrategy &strategy) {
     this->setStrategyName(strategy.getStrategyName());
 }
-
+// output overload
 std::ostream &operator<<(ostream &out, const BenevolentPlayerStrategy &strategy) {
     return out << strategy.getStrategyName();
 }
-
+// asignnment overload
 BenevolentPlayerStrategy &BenevolentPlayerStrategy::operator=(const BenevolentPlayerStrategy &strategy) {
     if(this != &strategy)
     {
@@ -320,10 +328,11 @@ BenevolentPlayerStrategy &BenevolentPlayerStrategy::operator=(const BenevolentPl
     return *this;
 }
 
+// issue order
 void BenevolentPlayerStrategy::issueOrder(Player* p, GameEngine *game, Deck* deck)
 {
         int index = 0;
-    for (int i=0; i<p->getDefendList().size(); i++)
+    for (int i=0; i<p->getDefendList().size(); i++) // get players defend list
     {
         if (p->getDefendList()[i]->armyCount < p->getDefendList()[index]->armyCount)
         {
@@ -331,14 +340,14 @@ void BenevolentPlayerStrategy::issueOrder(Player* p, GameEngine *game, Deck* dec
         }
     }
     Deploy *deploy = new Deploy(p,p->getDefendList()[index],p->getReinforcementPool());
-    p->issueOrderObject(deploy);
+    p->issueOrderObject(deploy); 
 
     int minIndex = 0;
     for (int i=0; i<p->getDefendList().size(); i++)
     {
         if (p->getDefendList()[i]->armyCount < p->getDefendList()[minIndex]->armyCount)
         {
-            minIndex = i;
+            minIndex = i; 
         }
     }
     vector<Territory*> weakestTerritory;
@@ -348,7 +357,7 @@ void BenevolentPlayerStrategy::issueOrder(Player* p, GameEngine *game, Deck* dec
 
     for (int i=0; i<p->getDefendList().size(); i++)
     {
-        if (p->getDefendList()[i]->armyCount > p->getDefendList()[maxIndexNeighbour]->armyCount)
+        if (p->getDefendList()[i]->armyCount > p->getDefendList()[maxIndexNeighbour]->armyCount) // deploy to territories with min armies
         {
             maxIndexNeighbour = i;
         }
@@ -369,14 +378,15 @@ void BenevolentPlayerStrategy::issueOrder(Player* p, GameEngine *game, Deck* dec
 }
 
 //NeutralPlayerStrategy class, // change into aggressive if attacked
-NeutralPlayerStrategy::NeutralPlayerStrategy() {
+NeutralPlayerStrategy::NeutralPlayerStrategy() { // default constructor
     setStrategyName("Neutral");
 }
 
-NeutralPlayerStrategy::~NeutralPlayerStrategy() {
+NeutralPlayerStrategy::~NeutralPlayerStrategy() { // destructor
 
 }
 
+// to defend
 vector<Territory*> NeutralPlayerStrategy::toDefend(vector<Territory*> Map, Player& player) {
     vector<Territory*> toDefendTerritory = player.getTerritories();
     cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be defended:" << endl;
@@ -390,6 +400,7 @@ vector<Territory*> NeutralPlayerStrategy::toDefend(vector<Territory*> Map, Playe
 	return player.getDefendList();
 }
 
+//to attack
 vector<Territory*> NeutralPlayerStrategy::toAttack(vector<Territory*> Map, Player &player) {
  	vector<Territory*> toAttackTerritory = player.getNeighbour(Map);
 	cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be attacked:" << endl;
@@ -402,6 +413,7 @@ vector<Territory*> NeutralPlayerStrategy::toAttack(vector<Territory*> Map, Playe
 	return player.getAttackList();
 }
 
+// issue order
 void NeutralPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck) {
     // Distribute neutral players armies evenly among all of its territories
     int distributeArmies = p->getReinforcementPool()/p->getDefendList().size();
@@ -409,17 +421,20 @@ void NeutralPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck) 
         p->getDefendList()[i]->armyCount += distributeArmies;
         p->setReinforcementPool(p->getReinforcementPool()-distributeArmies);
     }
-    cout << "NeutralPlayerStrategy issueOrder, Ending turn.\n" << endl;
+    cout << "NeutralPlayerStrategy issueOrder, Ending turn.\n" << endl; // end turn, does nothing
 }
 
+// copy constructor
 NeutralPlayerStrategy::NeutralPlayerStrategy(const NeutralPlayerStrategy &strategy) {
     this->setStrategyName(strategy.getStrategyName());
 }
 
+// os stream overlaod
 std::ostream &operator<<(ostream &out, const NeutralPlayerStrategy &strategy) {
     return out << strategy.getStrategyName();
 }
 
+// assignment overload
 NeutralPlayerStrategy &NeutralPlayerStrategy::operator=(const NeutralPlayerStrategy &strategy) {
     if(this != &strategy)
     {
@@ -429,14 +444,14 @@ NeutralPlayerStrategy &NeutralPlayerStrategy::operator=(const NeutralPlayerStrat
 }
 
 //CheaterPlayerStrategy class
-CheaterPlayerStrategy::CheaterPlayerStrategy() {
+CheaterPlayerStrategy::CheaterPlayerStrategy() { // defualt constructor
     setStrategyName("Cheater");
 }
 
-CheaterPlayerStrategy::~CheaterPlayerStrategy() {
+CheaterPlayerStrategy::~CheaterPlayerStrategy() { // destructor
 
 }
-
+// to defend
 vector<Territory*> CheaterPlayerStrategy::toDefend(vector<Territory*> Map, Player& player) {
     vector<Territory*> toDefendTerritory = player.getTerritories();
     cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be defended:" << endl;
@@ -449,7 +464,7 @@ vector<Territory*> CheaterPlayerStrategy::toDefend(vector<Territory*> Map, Playe
     player.setDefendList(toDefendTerritory);
 	return player.getDefendList();
 }
-
+// to attack
 vector<Territory*> CheaterPlayerStrategy::toAttack(vector<Territory*> Map, Player &player) {
  	vector<Territory*> toAttackTerritory = player.getNeighbour(Map);
 	cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be attacked:" << endl;
@@ -461,11 +476,11 @@ vector<Territory*> CheaterPlayerStrategy::toAttack(vector<Territory*> Map, Playe
     player.setAttackList(toAttackTerritory);
 	return player.getAttackList();
 }
-
+// issue order
 void CheaterPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck) {
-        vector<Territory*> enemyNeigh = p->getAttackList();
-        vector<Player*> players = game->getPlayersList();
-        Player* targetPlayer;
+        vector<Territory*> enemyNeigh = p->getAttackList(); // get neighbors
+        vector<Player*> players = game->getPlayersList(); // get game players
+        Player* targetPlayer; // person to attack
 
         // loop through players attack list
         for(int k = 0;k < enemyNeigh.size();k++){
@@ -514,15 +529,16 @@ void CheaterPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck) 
         }
         cout << "Cheater has taken control of its neighbors" << endl;
 }
-
+// Mutator
 CheaterPlayerStrategy::CheaterPlayerStrategy(const CheaterPlayerStrategy &strategy) {
     this->setStrategyName(strategy.getStrategyName());
 }
 
+// os stream overload
 std::ostream &operator<<(ostream &out, const CheaterPlayerStrategy &strategy) {
     return out << strategy.getStrategyName();
 }
-
+// assignment overload
 CheaterPlayerStrategy &CheaterPlayerStrategy::operator=(const CheaterPlayerStrategy &strategy) {
     if(this != &strategy)
     {
