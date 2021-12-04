@@ -531,15 +531,17 @@ CheaterPlayerStrategy &CheaterPlayerStrategy::operator=(const CheaterPlayerStrat
     return *this;
 }
 
-//AggressivePlayerStrategy class
+// Implementation of AggressivePlayerStrategy's default constructor
 AggressivePlayerStrategy::AggressivePlayerStrategy() {
     setStrategyName("Aggressive");
 }
 
+// Implementation of AggressivePlayerStrategy's destructor
 AggressivePlayerStrategy::~AggressivePlayerStrategy() {
 
 }
 
+// Implementation of Aggressive Player Strategy of toDefend()
 vector<Territory*> AggressivePlayerStrategy::toDefend(vector<Territory*> Map, Player& player) {
     vector<Territory*> toDefendTerritory = player.getTerritories();
     cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be defended:" << endl;
@@ -553,6 +555,7 @@ vector<Territory*> AggressivePlayerStrategy::toDefend(vector<Territory*> Map, Pl
     return player.getDefendList();
 }
 
+// Implementation of Aggressive Player Strategy of toAttack()
 vector<Territory*> AggressivePlayerStrategy::toAttack(vector<Territory*> Map, Player &player) {
     vector<Territory*> toAttackTerritory = player.getNeighbour(Map);
     cout << "\nPlayer " <<player.getPID() << "'s list of territories that can be attacked:" << endl;
@@ -565,6 +568,7 @@ vector<Territory*> AggressivePlayerStrategy::toAttack(vector<Territory*> Map, Pl
     return player.getAttackList();
 }
 
+// Implementation of AggressivePlayerStrategy of issueOrder()
 void AggressivePlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck *deck) {
 
     // Getting the strongest country index.
@@ -601,15 +605,17 @@ void AggressivePlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck *dec
     
 }
 
-
+// Implementation of AggressivePlayerStrategy of copy constructor
 AggressivePlayerStrategy::AggressivePlayerStrategy(const AggressivePlayerStrategy &strategy) {
     this->setStrategyName(strategy.getStrategyName());
 }
 
+// Implementation of AggressivePlayerStrategy's overloaded stream insertion operator
 std::ostream &operator<<(ostream &out, const AggressivePlayerStrategy &strategy) {
     return out << strategy.getStrategyName();
 }
 
+// Implementation of AggressivePlayerStrategy's overloaded assignment operator
 AggressivePlayerStrategy &AggressivePlayerStrategy::operator=(const AggressivePlayerStrategy &strategy) {
     if(this != &strategy)
     {
