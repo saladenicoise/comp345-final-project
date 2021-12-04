@@ -267,6 +267,11 @@ void HumanPlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck* deck){
                     }
                 }
             }
+	    // Switch strategy if target is neutral
+            if(targetPlayer->getPlayerStrategy()->getStrategyName() == "Neutral"){
+                cout << "Neutral Player Attacked!\nSwitching Neutral Player: " << targetPlayer->getPID() <<" to cheater/aggressive" << endl;
+                targetPlayer->setStrategy(new CheaterPlayerStrategy());
+            }
             cout<<"How many armies do you want to advance (choose between 1-" << p->getDefendList()[source]->armyCount << ")?: ";
             cin>>army;
             Advance *advance = new Advance(p,targetP,p->getDefendList()[source],neighbours[target],army);
@@ -615,6 +620,12 @@ void AggressivePlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck *dec
             }
             Advance *advance = new Advance(p,targetPlayer,p->getDefendList()[maxArmiesIndex],targets[i],p->getDefendList()[maxArmiesIndex]->armyCount);
             p->issueOrderObject(advance);
+		
+	    // Switch strategy if target is neutral
+            if(targetPlayer->getPlayerStrategy()->getStrategyName() == "Neutral"){
+                cout << "Neutral Player Attacked!\nSwitching Neutral Player: " << targetPlayer->getPID() <<" to cheater/aggressive" << endl;
+                targetPlayer->setStrategy(new CheaterPlayerStrategy());
+            }
         }
     }
 
