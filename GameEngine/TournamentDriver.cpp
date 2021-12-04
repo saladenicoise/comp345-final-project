@@ -35,7 +35,7 @@ int main() {
         }
 
     }
-    LogObserver* logObserver = new LogObserver;
+    LogObserver* logObserver = new LogObserver();
     GameEngine* g;
     if(mode == "console") {
         g = new GameEngine("console");
@@ -43,6 +43,8 @@ int main() {
         g = new GameEngine(filename);
     }
     g->attach(logObserver);
+    g->getCommandProcessor().attach(logObserver);
+
 
     while(g->getState() != "tourneystart") {
         cout << "Current State: " << g->getState() << endl;
