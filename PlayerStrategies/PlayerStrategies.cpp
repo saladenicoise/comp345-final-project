@@ -583,6 +583,21 @@ void AggressivePlayerStrategy::issueOrder(Player *p, GameEngine *game, Deck *dec
     vector<Territory*> neighbours = p->getNeighbour(placeholder);
     Territory* strongestCountry = p->getDefendList()[maxArmiesIndex];
 
+    vector<Territory*> targets = p->getAttackList();
+    for(int i = 0; i < targets.size(); i++) {
+        bool foundAdjacentTarget = std::find(strongestCountry->edges.begin(), strongestCountry->edges.end(), targets[i]) != strongestCountry->edges.end();
+        if(foundAdjacentTarget) {
+            Player* targetPlayer;
+            for(int j = 0; j < game->getPlayersList().size(); j++) {
+                if(game->getPlayersList()[j]->getPID() == targets[i]->getPlayerIDOccupying()) {
+                    targetPlayer = game->getPlayersList()[j];
+                }
+            }
+            Advance *advance = new Advance(p,targetPlayer,p->getDefendList()[maxArmiesIndex],targets[i],p->getDefendList()[maxArmiesIndex]->armyCount);
+            p->issueOrderObject(advance);
+        }
+    }
+
     
 }
 
